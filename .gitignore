@@ -1,0 +1,6 @@
+node_modules/
+# Fixture vendor declarations are the subject, not a dependency: several rules
+# decide by whether a symbol resolves into `node_modules`, so the path is the
+# fixture.
+!fixtures/**/node_modules/
+.tsgolint-build/

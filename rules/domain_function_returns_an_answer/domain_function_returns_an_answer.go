@@ -1,0 +1,93 @@
+package domain_function_returns_an_answer
+
+import (
+	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/microsoft/typescript-go/shim/checker"
+	"github.com/typescript-eslint/tsgolint/internal/archrule"
+	"github.com/typescript-eslint/tsgolint/internal/rule"
+	"github.com/typescript-eslint/tsgolint/internal/archtypes"
+)
+
+const ruleName = "domain-function-returns-an-answer"
+
+var defaultFiles = []string{"**/hexagon/domain/**"}
+
+func buildAnswerlessDomainFunctionMessage(name string) rule.RuleMessage {
+	return rule.RuleMessage{
+		Id: "answerlessDomainFunction",
+		Description: "`" + name +
+			"` returns nothing, so its caller learns neither the next state nor why the transition was refused, and the effect it must have had lives somewhere the model cannot show.",
+		Help: "Return the new aggregate or an explicit business refusal; leave the effect to the caller.",
+	}
+}
+
+// finalReturn follows a curried chain to the type its last call answers with.
+// `Promise` is deliberately not unwrapped: the domain is synchronous, and
+// waiting is `no-async-in-domain`'s subject.
+func finalReturn(c *checker.Checker, t *checker.Type) *checker.Type {
+	for range 8 {
+		signatures := archtypes.CallSignatures(c, t)
+		if len(signatures) == 0 {
+			return t
+		}
+		t = archtypes.ReturnType(c, signatures[len(signatures)-1])
+	}
+	return t
+}
+
+// answerless is true only when every constituent carries no answer. A lookup
+// returning `Occasion | undefined` answers "not found", and is not this rule's
+// subject.
+func answerless(t *checker.Type) bool {
+	if t == nil {
+		return false
+	}
+	for _, constituent := range archtypes.Constituents(t) {
+		if !archtypes.IsVoidLike(constituent) {
+			return false
+		}
+	}
+	return true
+}
+
+var DomainFunctionReturnsAnAnswerRule = archrule.Rule{Files: defaultFiles, Rule: rule.Rule{
+	Name: ruleName,
+	Run: func(ctx rule.RuleContext, _ any) rule.RuleListeners {
+		judge := func(node *ast.Node, function *ast.Node, name *ast.Node) {
+			if name == nil || !ast.HasSyntacticModifier(exported(node), ast.ModifierFlagsExport) {
+				return
+			}
+			// A written return type is `no-void-return-in-domain`'s subject;
+			// this rule judges only what was left to inference.
+			if function.Type() != nil {
+				return
+			}
+			if answerless(finalReturn(ctx.TypeChecker, ctx.TypeChecker.GetTypeAtLocation(node))) {
+				ctx.ReportNode(name, buildAnswerlessDomainFunctionMessage(name.Text()))
+			}
+		}
+
+		return rule.RuleListeners{
+			ast.KindFunctionDeclaration: func(node *ast.Node) { judge(node, node, node.Name()) },
+			ast.KindVariableDeclaration: func(node *ast.Node) {
+				declaration := node.AsVariableDeclaration()
+				if declaration.Initializer == nil || !ast.IsFunctionLike(declaration.Initializer) {
+					return
+				}
+				judge(node, declaration.Initializer, declaration.Name())
+			},
+		}
+	},
+}}
+
+// A `const` carries its `export` on the statement, two nodes up.
+func exported(node *ast.Node) *ast.Node {
+	if node.Kind != ast.KindVariableDeclaration {
+		return node
+	}
+	list := node.Parent
+	if list == nil || list.Parent == nil {
+		return node
+	}
+	return list.Parent
+}

@@ -1,0 +1,6 @@
+{
+    "extends": "./tsconfig.minimal.json",
+    "compilerOptions": {
+      "paths": { "@gifting/adapters-postgres": ["./packages/gifting/hexagon/adapters/driven/postgres/src/index.ts"] }
+    }
+  }
