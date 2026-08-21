@@ -10,11 +10,25 @@ declare, what crosses a context edge, and what a test may double.
 ## Install
 
 ```bash
+npm install -D lintcn        # bun add -D lintcn
 npx lintcn add https://github.com/matthewgulliver/tsgolint-rules
 npx lintcn lint
 ```
 
-The repository is private; `lintcn add` needs credentials that can read it.
+`lintcn add` does not install lintcn, so pin it yourself or every run
+resolves a different version.
+
+It vendors the rules into `.lintcn/` for you to commit, and writes a
+`.lintcn/.gitignore` naming `.tsgolint/`. That pattern has a trailing slash and
+`.tsgolint` is a symlink, so `git add` stages a link into your own
+`~/.cache/lintcn`. Ignore `.lintcn/.tsgolint` from the root instead, where
+lintcn will not rewrite it; a committed one breaks `lintcn add` against your
+repository for everyone, because the GitHub API reports it as a symlink and
+lintcn accepts only files and directories.
+
+`lintcn lint` reads the tsconfig it is given. A solution-style root config
+(`"files": []` plus `references`) lints nothing and still exits 0, so point
+`--tsconfig` at a project that names files.
 
 ## Rules
 
