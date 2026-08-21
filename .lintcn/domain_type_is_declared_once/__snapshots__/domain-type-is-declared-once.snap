@@ -1,0 +1,26 @@
+
+[TestDomainTypeIsDeclaredOnce/invalid-0 - 1]
+Diagnostic 1: redeclaredDomainType (1:13 - 1:20)
+Message: `Occasion` is also declared by `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/domain/src/pledges/occasion.ts` in this context, so there is no canonical `Occasion` and two files can disagree about what the model is while both compile.
+Help: Declare it once in the file that owns the concept and import it everywhere else, or give the second one the name of the different concept it actually describes.
+   1 | export type Occasion = { readonly id: string; readonly budget: number }
+     |             ~~~~~~~~
+---
+
+[TestDomainTypeIsDeclaredOnce/invalid-1 - 1]
+Diagnostic 1: redeclaredDomainType (1:13 - 1:20)
+Message: `Reminder` is also declared by `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/notifications/hexagon/application/src/reminder.ts` in this context, so there is no canonical `Reminder` and two files can disagree about what the model is while both compile.
+Help: Declare it once in the file that owns the concept and import it everywhere else, or give the second one the name of the different concept it actually describes.
+   1 | export type Reminder = { readonly at: string; readonly channel: string }
+     |             ~~~~~~~~
+---
+
+[TestDomainTypeIsDeclaredOnce/invalid-2 - 1]
+Diagnostic 1: redeclaredDomainType (2:26 - 2:33)
+Message: `Occasion` is also declared by `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/domain/src/pledges/occasion.ts` in this context, so there is no canonical `Occasion` and two files can disagree about what the model is while both compile.
+Help: Declare it once in the file that owns the concept and import it everywhere else, or give the second one the name of the different concept it actually describes.
+   1 | 
+   2 |         export interface Occasion {
+     |                          ~~~~~~~~
+   3 |           readonly id: string
+---
