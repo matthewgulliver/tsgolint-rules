@@ -1,0 +1,156 @@
+
+[TestUseCaseResultIsDiscriminated/invalid-0 - 1]
+Diagnostic 1: undiscriminatedResult (2:22 - 2:37)
+Message: `pledgeToOccasion` returns a union of object shapes with no property that is a literal in every member, so a caller must guess which outcome it holds by probing for fields.
+Help: Give every member the same discriminant property with a distinct literal value, so callers narrow on it and a missed outcome is a type error.
+   1 | 
+   2 |         export const pledgeToOccasion = async (): Promise<
+     |                      ~~~~~~~~~~~~~~~~
+   3 |           { readonly occasionId: string } | { readonly reason: string }
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-1 - 1]
+Diagnostic 1: undiscriminatedResult (4:25 - 4:40)
+Message: `pledgeToOccasion` returns a union of object shapes with no property that is a literal in every member, so a caller must guess which outcome it holds by probing for fields.
+Help: Give every member the same discriminant property with a distinct literal value, so callers narrow on it and a missed outcome is a type error.
+   3 |         type Conflict = { readonly outcome: string }
+   4 |         export function pledgeToOccasion(): Saved | Conflict {
+     |                         ~~~~~~~~~~~~~~~~
+   5 |           return { outcome: "saved", occasionId: "o-1" }
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-2 - 1]
+Diagnostic 1: undiscriminatedResult (4:22 - 4:46)
+Message: `createPledgingToOccasions` returns a union of object shapes with no property that is a literal in every member, so a caller must guess which outcome it holds by probing for fields.
+Help: Give every member the same discriminant property with a distinct literal value, so callers narrow on it and a missed outcome is a type error.
+   3 |         type Conflict = { readonly reason: "conflict" }
+   4 |         export const createPledgingToOccasions =
+     |                      ~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |           () => async (): Promise<Saved | Conflict> => ({ outcome: "saved" })
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-3 - 1]
+Diagnostic 1: undiscriminatedResult (3:22 - 3:33)
+Message: `settlePledge` returns a union of object shapes with no property that is a literal in every member, so a caller must guess which outcome it holds by probing for fields.
+Help: Give every member the same discriminant property with a distinct literal value, so callers narrow on it and a missed outcome is a type error.
+   2 |         type Occasion = { readonly id: string }
+   3 |         export const settlePledge = (
+     |                      ~~~~~~~~~~~~
+   4 |           occasion: Occasion,
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-4 - 1]
+Diagnostic 1: genericFailureReason (6:22 - 6:37)
+Message: `pledgeToOccasion` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   5 |           | { readonly ok: false; readonly error: FailureText }
+   6 |         export const pledgeToOccasion = (): PledgeResult => ({ ok: true })
+     |                      ~~~~~~~~~~~~~~~~
+   7 |       
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-5 - 1]
+Diagnostic 1: genericFailureReason (2:22 - 2:37)
+Message: `pledgeToOccasion` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeToOccasion = (message: string) => {
+     |                      ~~~~~~~~~~~~~~~~
+   3 |           if (message.length > 3) return { ok: false as const, error: message }
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-6 - 1]
+Diagnostic 1: genericFailureReason (2:22 - 2:37)
+Message: `pledgeToOccasion` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeToOccasion = (): { readonly ok: boolean; readonly error: string } =>
+     |                      ~~~~~~~~~~~~~~~~
+   3 |           ({ ok: true, error: "" })
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-7 - 1]
+Diagnostic 1: genericFailureReason (5:22 - 5:37)
+Message: `pledgeToOccasion` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   4 |           | { readonly ok: false; readonly error: "exceeds-budget" | string }
+   5 |         export const pledgeToOccasion = (): PledgeResult => ({ ok: true })
+     |                      ~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-8 - 1]
+Diagnostic 1: genericFailureReason (5:22 - 5:37)
+Message: `pledgeToOccasion` returns a `reason` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   4 |           | { readonly ok: false; readonly reason: string }
+   5 |         export const pledgeToOccasion = (): PledgeResult => ({ ok: true })
+     |                      ~~~~~~~~~~~~~~~~
+   6 |       
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-9 - 1]
+Diagnostic 1: genericFailureReason (6:22 - 6:39)
+Message: `pledgeContribution` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   5 |           | { readonly success: false; readonly error: string }
+   6 |         export const pledgeContribution = (occasion: Occasion): PledgeDecision =>
+     |                      ~~~~~~~~~~~~~~~~~~
+   7 |           ({ success: true, occasion })
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-10 - 1]
+Diagnostic 1: genericFailureReason (2:22 - 2:37)
+Message: `pledgeToOccasion` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeToOccasion = (): { readonly occasionId: string } | { readonly error: string } =>
+     |                      ~~~~~~~~~~~~~~~~
+   3 |           ({ occasionId: "o-1" })
+
+Diagnostic 2: undiscriminatedResult (2:22 - 2:37)
+Message: `pledgeToOccasion` returns a union of object shapes with no property that is a literal in every member, so a caller must guess which outcome it holds by probing for fields.
+Help: Give every member the same discriminant property with a distinct literal value, so callers narrow on it and a missed outcome is a type error.
+   1 | 
+   2 |         export const pledgeToOccasion = (): { readonly occasionId: string } | { readonly error: string } =>
+     |                      ~~~~~~~~~~~~~~~~
+   3 |           ({ occasionId: "o-1" })
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-11 - 1]
+Diagnostic 1: genericFailureReason (2:22 - 2:37)
+Message: `pledgeToOccasion` returns a `error` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeToOccasion = (): { readonly ok: boolean; readonly error: readonly string[] } =>
+     |                      ~~~~~~~~~~~~~~~~
+   3 |           ({ ok: true, error: [] })
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-12 - 1]
+Diagnostic 1: genericFailureReason (2:22 - 2:39)
+Message: `pledgeContribution` returns a `violations` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeContribution = (): { readonly outcome: "refused"; readonly violations: readonly string[] } =>
+     |                      ~~~~~~~~~~~~~~~~~~
+   3 |           ({ outcome: "refused", violations: [] })
+---
+
+[TestUseCaseResultIsDiscriminated/invalid-13 - 1]
+Diagnostic 1: genericFailureReason (2:22 - 2:39)
+Message: `pledgeContribution` returns a `faults` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeContribution = (): { readonly faults: string[]; readonly problems: ReadonlyArray<string> } =>
+     |                      ~~~~~~~~~~~~~~~~~~
+   3 |           ({ faults: [], problems: [] })
+
+Diagnostic 2: genericFailureReason (2:22 - 2:39)
+Message: `pledgeContribution` returns a `problems` that admits any string, so the caller cannot switch on the outcome and the compiler cannot prove every failure is handled.
+Help: Type it as a union of the specific reason literals this operation can produce.
+   1 | 
+   2 |         export const pledgeContribution = (): { readonly faults: string[]; readonly problems: ReadonlyArray<string> } =>
+     |                      ~~~~~~~~~~~~~~~~~~
+   3 |           ({ faults: [], problems: [] })
+---
