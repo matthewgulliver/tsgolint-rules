@@ -1,0 +1,42 @@
+
+[TestReadPortReturnsAnAnswer/invalid-0 - 1]
+Diagnostic 1: answerlessRead (2:9 - 4:9)
+Message: `OccasionDashboardRows.recordDashboardView` returns nothing, so the only reason to call it is its effect — and this declaration is a read port, which a reviewer skims as a question.
+Help: Move the operation to the write port that owns the consistency boundary, or return the answer the caller asked for.
+   1 | 
+   2 |         export interface OccasionDashboardRows {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           readonly recordDashboardView: (id: string) => Promise<void>
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestReadPortReturnsAnAnswer/invalid-1 - 1]
+Diagnostic 1: answerlessRead (3:9 - 5:9)
+Message: `OccasionDashboardReader.touch` returns nothing, so the only reason to call it is its effect — and this declaration is a read port, which a reviewer skims as a question.
+Help: Move the operation to the write port that owns the consistency boundary, or return the answer the caller asked for.
+   2 |         type Acknowledged = Promise<void>
+   3 |         export interface OccasionDashboardReader {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           readonly touch: (id: string) => Acknowledged
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+     | ~~~~~~~~~
+   6 |       
+---
+
+[TestReadPortReturnsAnAnswer/invalid-2 - 1]
+Diagnostic 1: answerlessRead (2:9 - 4:9)
+Message: `ContributorDashboard.refresh` returns nothing, so the only reason to call it is its effect — and this declaration is a read port, which a reviewer skims as a question.
+Help: Move the operation to the write port that owns the consistency boundary, or return the answer the caller asked for.
+   1 | 
+   2 |         export interface ContributorDashboard {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           readonly refresh: (id: string) => Promise<void>
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
