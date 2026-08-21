@@ -1,7 +1,8 @@
 {
   "type": "module",
   "scripts": {
-    "new:rule": "plop rule"
+    "new:rule": "plop rule",
+    "comments": "cd tools/comments && GOWORK=off go run . ../../.lintcn ../../docs/rule-comments.md"
   },
   "dependencies": {
     "lintcn": "^0.10.1"

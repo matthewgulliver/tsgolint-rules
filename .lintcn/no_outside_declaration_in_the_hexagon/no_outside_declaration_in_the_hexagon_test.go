@@ -39,8 +39,6 @@ var tree = map[string]string{
 func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoOutsideDeclarationInTheHexagonRule, []rule_tester.ValidTestCase{
-		// A port beside it and a schema library: both allowed, and the reason the
-		// rule resolves the symbol rather than banning package imports.
 		{
 			Code: `
         import type { PledgePersistence } from "./ports/pledge-persistence"
@@ -50,8 +48,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			FileName: useCase,
 			Files:    tree,
 		},
-		// `adapters` in a package's own subpath is not this repository's adapter
-		// tree, which a path rule reading the specifier could not tell.
 		{
 			Code: `
         import { adapt } from "some-lib/adapters"
@@ -60,8 +56,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			FileName: useCase,
 			Files:    tree,
 		},
-		// The barrel re-exports from inside as well as outside; this import
-		// resolves to the inside half.
 		{
 			Code: `
         import { PledgePersistence } from "./index"
@@ -70,7 +64,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			FileName: useCase,
 			Files:    tree,
 		},
-		// The domain importing its own neighbour.
 		{
 			Code: `
         import type { Money } from "./money"
@@ -79,8 +72,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			FileName: domainFile,
 			Files:    tree,
 		},
-		// Configured scope replaces the default, so the adapter tree stops being
-		// outside and this import stops being anyone's business.
 		{
 			Code: `
         import { PostgresPledgeRepository } from "../../adapters/driven/postgres/src/repo"
@@ -90,8 +81,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files:    tree,
 			Options:  map[string]any{"outsideFiles": []string{"**/apps/*/src/**"}},
 		},
-		// The gate: outside the hexagon trees (default file name `file.ts`) the
-		// rule reports nothing, however far outside the import reaches.
 		{
 			Code: `
         import { PostgresPledgeRepository } from "./repo"
@@ -100,7 +89,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files: tree,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A use case reaching straight into the adapter tree.
 		{
 			Code: `
         import { PostgresPledgeRepository } from "../../adapters/driven/postgres/src/repo"
@@ -110,8 +98,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files:    tree,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "outsideDeclarationImported"}},
 		},
-		// The blind spot the path rules cannot close: the specifier is a legal
-		// neighbour, and the symbol behind it was declared in an adapter.
 		{
 			Code: `
         import { PostgresPledgeRepository } from "./index"
@@ -121,7 +107,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files:    tree,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "outsideDeclarationImported"}},
 		},
-		// The same, through a workspace alias that only the resolver can follow.
 		{
 			Code: `
         import { PostgresPledgeRepository } from "@gifting/adapters-postgres"
@@ -132,7 +117,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			TSConfig: "tsconfig.paths.json",
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "outsideDeclarationImported"}},
 		},
-		// A type-only import is still the domain knowing a stored row's shape.
 		{
 			Code: `
         import type { StoredRow } from "../../../adapters/driven/postgres/src/repo"
@@ -142,7 +126,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files:    tree,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "outsideDeclarationImported"}},
 		},
-		// A namespace import hides the name, never the declaration.
 		{
 			Code: `
         import * as postgres from "../../adapters/driven/postgres/src/repo"
@@ -152,8 +135,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files:    tree,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "outsideDeclarationImported"}},
 		},
-		// A side-effect import binds nothing, so there is no symbol to resolve —
-		// the module itself is what crossed the line.
 		{
 			Code: `
         import "../../adapters/driven/postgres/src/repo"
@@ -162,7 +143,6 @@ func TestNoOutsideDeclarationInTheHexagon(t *testing.T) {
 			Files:    tree,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "outsideModuleImported"}},
 		},
-		// A re-export hands the outside on without ever binding it either.
 		{
 			Code: `
         export { PostgresPledgeRepository } from "../../adapters/driven/postgres/src/repo"

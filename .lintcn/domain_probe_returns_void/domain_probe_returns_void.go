@@ -40,9 +40,6 @@ func compile(patterns []string) []*regexp.Regexp {
 }
 
 var DomainProbeReturnsVoidRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "domain-probe-returns-void",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "domain-probe-returns-void")

@@ -15,9 +15,6 @@ import (
 
 var defaultFiles = []string{"**/ports/**"}
 
-// The same vocabulary `arch/read-port-writes-nothing` uses to decide which
-// declarations are read ports. That rule judges member names; this one judges
-// what the member gives back.
 var defaultReadPortPatterns = []string{"Rows$", "Reader$", "View$", "Dashboard$"}
 
 type Options struct {
@@ -44,9 +41,6 @@ func compile(patterns []string) []*regexp.Regexp {
 }
 
 var ReadPortReturnsAnAnswerRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "read-port-returns-an-answer",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "read-port-returns-an-answer")
@@ -78,8 +72,6 @@ var ReadPortReturnsAnAnswerRule = rule.Rule{
 
 			for _, member := range archkit.Members(ctx.TypeChecker, archkit.DeclaredType(ctx.TypeChecker, node)) {
 				for _, signature := range archkit.CallSignatures(ctx.TypeChecker, member.Type) {
-					// `Promise<void>` is the shape this rule exists for: the
-					// annotation reads as a value and resolves to nothing.
 					returned := archkit.Unwrapped(ctx.TypeChecker,
 						archkit.ReturnType(ctx.TypeChecker, signature))
 					if archkit.IsVoidLike(returned) {

@@ -16,11 +16,6 @@ var defaultFiles = []string{
 	"**/hexagon/domain/**",
 }
 
-// A bare `Error` is the hexagonal skill's own way to reject an impossible
-// state at construction — its worked example throws one from `createMoney`
-// while returning `exceeds-budget` as a result value in the same function. An
-// invariant violation is not a business outcome, so the standard-library arm
-// judges the application tree only; the package-dependency arm judges both.
 var defaultStandardLibraryFiles = []string{
 	"**/hexagon/application/**",
 }
@@ -46,9 +41,6 @@ func buildForeignThrowMessage(name string, source string) rule.RuleMessage {
 }
 
 var UseCaseThrowsADomainErrorRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "use-case-throws-a-domain-error",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "use-case-throws-a-domain-error")
@@ -62,8 +54,6 @@ var UseCaseThrowsADomainErrorRule = rule.Rule{
 				thrownType := ctx.TypeChecker.GetTypeAtLocation(thrown)
 				files := archkit.DeclaringFiles(thrownType)
 				if len(files) == 0 {
-					// A rethrown `unknown` has no declaration to judge, and
-					// guessing is how a rule starts reporting on nothing.
 					return
 				}
 

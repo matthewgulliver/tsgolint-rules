@@ -14,7 +14,6 @@ const inDomain = "packages/gifting/hexagon/domain/src/occasions/occasion.ts"
 func TestUseCaseResultIsDiscriminated(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &UseCaseResultIsDiscriminatedRule, []rule_tester.ValidTestCase{
-		// A discriminated union: one literal field says which member this is.
 		{
 			Code: `
         type PledgeResult =
@@ -25,7 +24,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// The curried use case the docs actually ship.
 		{
 			Code: `
         type PledgeResult =
@@ -40,7 +38,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// An absent answer is not an undiscriminated union.
 		{
 			Code: `
         type Occasion = { readonly id: string }
@@ -48,15 +45,12 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// Not exported, so not the use case's published outcome.
 		{
 			Code: `
         const decide = (): { readonly a: string } | { readonly b: string } => ({ a: "" })
       `,
 			FileName: inApplication,
 		},
-		// aggregate-root.md's own transition: the next state or an explicit
-		// refusal, discriminated on a boolean literal.
 		{
 			Code: `
         type Occasion = { readonly id: string }
@@ -68,7 +62,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// Specific reason literals: the compiler can prove every failure handled.
 		{
 			Code: `
         type PledgeResult =
@@ -78,7 +71,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// `reason: string` is left to configuration: two docs declare it themselves.
 		{
 			Code: `
         type PaymentResult =
@@ -88,8 +80,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// RFC 9457's validation-error array, which problem-details.md endorses
-		// by example, so `errors` is deliberately not seeded.
 		{
 			Code: `
         export const pledgeToOccasion = (): { readonly errors: readonly string[] } =>
@@ -97,8 +87,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// An array whose elements are modelled reasons: the caller can still
-		// switch, once per element.
 		{
 			Code: `
         type Violation = "exceeds-budget" | "funding-closed"
@@ -107,7 +95,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// An array of identifiers, which are strings because they identify things.
 		{
 			Code: `
         export const pledgeToOccasion = (): { readonly pledgeIds: readonly string[] } =>
@@ -115,8 +102,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// A generic that carries a string without being a collection of them:
-		// only arrays and tuples have elements this rule looks inside.
 		{
 			Code: `
         type Boxed<T> = { readonly inner: T }
@@ -125,8 +110,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// The gate: outside both hexagon trees (default file name `file.ts`)
-		// the rule reports nothing, however undiscriminated the result is.
 		{
 			Code: `
         export const pledgeToOccasion = async (): Promise<
@@ -135,8 +118,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
       `,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A union with nothing to switch on — the caller has to guess by probing
-		// for a field.
 		{
 			Code: `
         export const pledgeToOccasion = async (): Promise<
@@ -146,8 +127,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "undiscriminatedResult"}},
 		},
-		// A shared key whose type is widened to `string` discriminates nothing,
-		// and reads identically to the good version in the source.
 		{
 			Code: `
         type Saved = { readonly outcome: string; readonly occasionId: string }
@@ -159,7 +138,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "undiscriminatedResult"}},
 		},
-		// Named members still need a shared discriminant; these have none in common.
 		{
 			Code: `
         type Saved = { readonly outcome: "saved" }
@@ -170,8 +148,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "undiscriminatedResult"}},
 		},
-		// The same claim one tree over: a transition returning the next state
-		// or a refusal, with nothing to narrow on.
 		{
 			Code: `
         type Occasion = { readonly id: string }
@@ -183,7 +159,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "undiscriminatedResult"}},
 		},
-		// A widening hidden behind an alias, which the written annotation never shows.
 		{
 			Code: `
         type FailureText = string
@@ -195,7 +170,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// No annotation at all: the inferred `error` is whatever `message` was.
 		{
 			Code: `
         export const pledgeToOccasion = (message: string) => {
@@ -206,7 +180,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// A single shape, not a union, still answers with a bare string.
 		{
 			Code: `
         export const pledgeToOccasion = (): { readonly ok: boolean; readonly error: string } =>
@@ -215,7 +188,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// A literal widened by a bare `string` sibling collapses to `string`.
 		{
 			Code: `
         type PledgeResult =
@@ -226,7 +198,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// `reason` judged only once configured.
 		{
 			Code: `
         type PledgeResult =
@@ -238,7 +209,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			Options:  Options{FailureReasonMemberPatterns: []string{"^reason$"}},
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// The same claim one tree over.
 		{
 			Code: `
         type Occasion = { readonly id: string }
@@ -251,7 +221,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// Both arms on one function: undiscriminated, and a generic error.
 		{
 			Code: `
         export const pledgeToOccasion = (): { readonly occasionId: string } | { readonly error: string } =>
@@ -263,8 +232,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 				{MessageId: "undiscriminatedResult"},
 			},
 		},
-		// An array of unconstrained strings is the same failure once per element,
-		// and a `readonly string[]` is a reference type rather than a flagged one.
 		{
 			Code: `
         export const pledgeToOccasion = (): { readonly ok: boolean; readonly error: readonly string[] } =>
@@ -273,7 +240,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// The refusal shape a repository following this tree actually shipped.
 		{
 			Code: `
         export const pledgeContribution = (): { readonly outcome: "refused"; readonly violations: readonly string[] } =>
@@ -282,7 +248,6 @@ func TestUseCaseResultIsDiscriminated(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "genericFailureReason"}},
 		},
-		// The other two spellings the same shape takes.
 		{
 			Code: `
         export const pledgeContribution = (): { readonly faults: string[]; readonly problems: ReadonlyArray<string> } =>

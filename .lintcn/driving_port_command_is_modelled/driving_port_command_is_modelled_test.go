@@ -12,7 +12,6 @@ const inPorts = "packages/gifting/hexagon/application/src/ports/for-pledging-to-
 func TestDrivingPortCommandIsModelled(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &DrivingPortCommandIsModelledRule, []rule_tester.ValidTestCase{
-		// A modelled command, which is what the doc asks a driving port to take.
 		{
 			Code: `
         type PledgeCommand = { readonly occasionId: string; readonly amount: number }
@@ -22,8 +21,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// A branded value is an intersection, not a bare primitive — the whole
-		// reason this is a type-aware rule.
 		{
 			Code: `
         type OccasionId = string & { readonly __brand: "OccasionId" }
@@ -33,7 +30,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// A literal union is a modelled vocabulary.
 		{
 			Code: `
         export interface ForRatingAPledge {
@@ -42,7 +38,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// A driven port answering by id is not this rule's business.
 		{
 			Code: `
         export interface PledgePersistence {
@@ -51,8 +46,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// The gate: outside the ports tree (default file name `file.ts`) the
-		// rule reports nothing, however bare the parameter is.
 		{
 			Code: `
         export interface ForPledgingToOccasions {
@@ -61,8 +54,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
       `,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// Loose primitives where a command belongs: the caller has to know the
-		// argument order, and nothing names what the operation needs.
 		{
 			Code: `
         export interface ForPledgingToOccasions {
@@ -72,7 +63,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
 			FileName: inPorts,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "unmodelledCommand"}},
 		},
-		// An alias to a primitive is still a primitive.
 		{
 			Code: `
         type OccasionId = string
@@ -83,7 +73,6 @@ func TestDrivingPortCommandIsModelled(t *testing.T) {
 			FileName: inPorts,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "unmodelledCommand"}},
 		},
-		// A configured naming vocabulary reaches a port not called `For…`.
 		{
 			Code: `
         export interface DrivesPledging {

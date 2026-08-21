@@ -20,18 +20,14 @@ var vendor = map[string]string{
 	"node_modules/pg-types/index.d.ts": `
     export interface QueryResult<R> { rows: R[] }
   `,
-	// The platform's transport type, declared by a package rather than lib.dom.
 	"node_modules/undici-types/index.d.ts": `
     export interface Request { readonly url: string }
     export interface Headers { get(name: string): string | null }
   `,
-	// A generic helper is a type alias, the shape it describes is ours.
 	"node_modules/zod/index.d.ts": `
     export type infer<T> = T extends { _output: infer O } ? O : never;
     export declare const z: { object: (shape: unknown) => { _output: unknown } };
   `,
-	// A vendor that publishes its types inside a namespace, so every reference
-	// to one is written `namespace.Type` rather than as a bare name.
 	"node_modules/aws-sdk/index.d.ts": `
     export declare namespace storage {
       export interface Client { send(command: string): Promise<void> }
@@ -43,7 +39,6 @@ var vendor = map[string]string{
 func TestNoProviderTypeInSignature(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoProviderTypeInSignatureRule, []rule_tester.ValidTestCase{
-		// A port this repository declares, which is what a signature here should say.
 		{
 			Code: `
         interface PledgePersistence { readonly save: (id: string) => Promise<void> }
@@ -52,13 +47,10 @@ func TestNoProviderTypeInSignature(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// Standard-library types are not a vendor's object.
 		{
 			Code:     `export const at = (when: Date, ids: ReadonlyArray<string>) => [when, ids]`,
 			FileName: inApplication,
 		},
-		// A schema-derived command: declared through an alias in node_modules,
-		// describing a shape this repository owns.
 		{
 			Code: `
         import type { infer as Infer } from "zod"
@@ -68,8 +60,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			FileName: inApplication,
 			Files:    vendor,
 		},
-		// The doc's own principal: branded with a non-exported unique symbol,
-		// and narrowed by intersection rather than replaced.
 		{
 			Code: `
         declare const authenticated: unique symbol
@@ -83,14 +73,12 @@ func TestNoProviderTypeInSignature(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// A parameter the vocabulary does not call identity.
 		{
 			Code: `
         export const pledge = (occasionId: string) => occasionId
       `,
 			FileName: inApplication,
 		},
-		// A domain command that merely shares the transport's name.
 		{
 			Code: `
         type PledgeRequest = { readonly occasionId: string }
@@ -98,7 +86,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// A local `Request` is this repository's own declaration, not the platform's.
 		{
 			Code: `
         interface Request { readonly body: string }
@@ -106,7 +93,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// A return type this repository owns, wrapped in the language's own Promise.
 		{
 			Code: `
         type Occasion = { readonly id: string }
@@ -117,7 +103,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// A schema-derived return: a package alias describing our shape.
 		{
 			Code: `
         import type { infer as Infer } from "zod"
@@ -127,13 +112,10 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			FileName: inApplication,
 			Files:    vendor,
 		},
-		// A driving adapter holding the transport, which is its whole job.
 		{
 			Code:     `export const setCookie = (res: Response, id: string) => res.headers.set("Set-Cookie", id)`,
 			FileName: "packages/gifting/hexagon/adapters/driving/bff/src/session-cookie.ts",
 		},
-		// Destructuring a type this repository owns is ordinary, and naming no
-		// parameter must not stop the rule reaching the next file.
 		{
 			Code: `
         export type PledgeCommand = { readonly occasionId: string }
@@ -142,9 +124,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			FileName: inApplication,
 			Files:    vendor,
 		},
-		// A namespaced type this repository declares. Asking a qualified name
-		// for its text as if it were an identifier took the whole run down, so
-		// every file after it went unjudged.
 		{
 			Code: `
         namespace shapes { export interface Of { readonly value: string } }
@@ -152,8 +131,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
       `,
 			FileName: inApplication,
 		},
-		// The gate: outside the inside trees (default file name `file.ts`) the
-		// rule reports nothing, however vendor-heavy the signature is.
 		{
 			Code: `
         import type { Context } from "hono"
@@ -162,7 +139,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files: vendor,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A framework's request object reaching application policy.
 		{
 			Code: `
         import type { Context } from "hono"
@@ -172,7 +148,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerParameterType"}},
 		},
-		// A port method's parameter, and the vendor type nested in a generic.
 		{
 			Code: `
         import type { Pool } from "pg"
@@ -184,7 +159,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerParameterType"}},
 		},
-		// Identity as a bare id: possession of the string is enough.
 		{
 			Code: `
         export const pledge = (principal: string) => principal
@@ -192,7 +166,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "unbrandedPrincipal"}},
 		},
-		// A principal-shaped object anyone can write out.
 		{
 			Code: `
         type Caller = { readonly userId: string; readonly tenantId: string }
@@ -201,7 +174,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "unbrandedPrincipal"}},
 		},
-		// A parameter named identity only by configuration.
 		{
 			Code: `
         export const pledge = (caller: string) => caller
@@ -212,7 +184,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			},
 			Errors: []rule_tester.InvalidTestCaseError{{MessageId: "unbrandedPrincipal"}},
 		},
-		// A port method answering in the driver's vocabulary, nested in a Promise.
 		{
 			Code: `
         import type { QueryResult } from "pg-types"
@@ -225,7 +196,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerReturnType"}},
 		},
-		// A vendor object held as a member of an inside contract.
 		{
 			Code: `
         import type { Pool } from "pg"
@@ -235,7 +205,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerReturnType"}},
 		},
-		// Renamed on import; the checker follows the alias.
 		{
 			Code: `
         import type { Pool as Connection } from "pg"
@@ -245,7 +214,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerReturnType"}},
 		},
-		// A function-typed member returning the vendor's object reports once.
 		{
 			Code: `
         import type { QueryResult } from "pg-types"
@@ -257,7 +225,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerReturnType"}},
 		},
-		// The platform's Request crossing into the inside.
 		{
 			Code: `
         import type { Request } from "undici-types"
@@ -267,7 +234,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "transportTypeInSignature"}},
 		},
-		// Headers as a port method's answer.
 		{
 			Code: `
         import type { Headers } from "undici-types"
@@ -279,7 +245,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "transportTypeInSignature"}},
 		},
-		// The standard library's own transport type, pulled in by reference.
 		{
 			Code: `
         /// <reference lib="dom" />
@@ -288,7 +253,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			FileName: inApplication,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "transportTypeInSignature"}},
 		},
-		// A transport type named only by configuration.
 		{
 			Code: `
         import type { Context } from "hono"
@@ -299,7 +263,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Options:  Options{TransportTypeNamePatterns: []string{"^Context$"}},
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "transportTypeInSignature"}},
 		},
-		// The transport renamed on import: a new name, the same declaration.
 		{
 			Code: `
         import type { Request as Incoming } from "undici-types"
@@ -310,9 +273,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Options:  Options{TransportTypeNamePatterns: []string{"^Incoming$"}},
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "transportTypeInSignature"}},
 		},
-		// A destructured parameter has no name to blame, and the rule used to
-		// ask for one anyway and take the whole run down with it. The type is
-		// still the signature's, so the vendor question is still asked.
 		{
 			Code: `
         import type { Pool } from "pg"
@@ -322,8 +282,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerParameterType"}},
 		},
-		// A vendor's namespaced type, reported by the name it is declared under
-		// rather than the namespace it is reached through.
 		{
 			Code: `
         import type { storage } from "aws-sdk"
@@ -333,7 +291,6 @@ func TestNoProviderTypeInSignature(t *testing.T) {
 			Files:    vendor,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "providerParameterType"}},
 		},
-		// The same, nested one namespace deeper.
 		{
 			Code: `
         import type { storage } from "aws-sdk"

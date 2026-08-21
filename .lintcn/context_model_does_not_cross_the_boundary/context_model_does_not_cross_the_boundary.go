@@ -16,22 +16,10 @@ import (
 
 var defaultFiles = []string{"**/packages/*/**"}
 
-// A context's identity, captured by a group named `name` — the same decision
-// `no-cross-context-internal-import` records: one context spelled two ways must
-// capture the same text, or an intra-context reference reads as a crossing.
-//
-// Spelled without the lookahead its JavaScript sibling uses. Go's regexp is
-// RE2 and has no lookaround; only the capture is read, so a trailing group
-// costs nothing.
 var defaultContextRootPatterns = []string{`(^|/)packages/(?<name>[^/]+)(/|$)`}
 
-// A file another context may legitimately be reached through.
-// A barrel is not a published contract: it is what a context ends up publishing
-// by accident. dependency-cruiser forbids importing an index file at all, so it
-// cannot also be the surface a second context is allowed to depend on.
 var defaultPublicContractPathPatterns = []string{`/public\.tsx?$`, `/public/`}
 
-// Trees that belong to no context and are shared on purpose.
 var defaultSharedFiles = []string{"**/shared-kernel/**"}
 
 type Options struct {
@@ -66,9 +54,6 @@ func matchesAny(patterns []*regexp.Regexp, file string) bool {
 }
 
 var ContextModelDoesNotCrossTheBoundaryRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "context-model-does-not-cross-the-boundary",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "context-model-does-not-cross-the-boundary")
@@ -76,16 +61,11 @@ var ContextModelDoesNotCrossTheBoundaryRule = rule.Rule{
 		published := archkit.Compile(or(opts.PublicContractPathPatterns, defaultPublicContractPathPatterns))
 		shared := or(opts.SharedFiles, defaultSharedFiles)
 
-		// A file no pattern identifies belongs to no context, and this rule has
-		// nothing to compare. Returning early is the shipped precedent, and the
-		// pages record that it makes a misconfigured pattern a green run.
 		here, identified := archkit.ContextOf(roots, ctx.SourceFile.FileName())
 		if !identified {
 			return rule.RuleListeners{}
 		}
 
-		// crossing reports the first declaring file that puts a written type
-		// name inside another context's internals.
 		crossing := func(written *ast.Node) (string, bool) {
 			symbol := ctx.TypeChecker.GetSymbolAtLocation(written)
 			if symbol == nil {
@@ -106,10 +86,6 @@ var ContextModelDoesNotCrossTheBoundaryRule = rule.Rule{
 				if archkit.Includes(shared, file) {
 					continue
 				}
-				// Declared *in* another context's published contract is the
-				// surface that context offered. Merely re-exported through one
-				// is not: the declaration still lives in its internals, which
-				// is the leak §2.3 names.
 				if matchesAny(published, file) {
 					continue
 				}
@@ -159,8 +135,6 @@ var ContextModelDoesNotCrossTheBoundaryRule = rule.Rule{
 				}
 				judgeSignature(declaration.Initializer, declaration.Name())
 			},
-			// A published `interface` or `type` carries the model just as a
-			// function signature does, and is how a context most often leaks.
 			ast.KindInterfaceDeclaration: func(node *ast.Node) {
 				if !ast.HasSyntacticModifier(node, ast.ModifierFlagsExport) {
 					return
@@ -177,7 +151,6 @@ var ContextModelDoesNotCrossTheBoundaryRule = rule.Rule{
 	}),
 }
 
-// A `const` carries its `export` on the statement, two nodes up.
 func exported(node *ast.Node) *ast.Node {
 	list := node.Parent
 	if list == nil || list.Parent == nil {

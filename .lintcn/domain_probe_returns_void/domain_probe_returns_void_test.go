@@ -12,7 +12,6 @@ const inApplicationPorts = "packages/gifting/hexagon/application/src/ports/pledg
 func TestDomainProbeReturnsVoid(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &DomainProbeReturnsVoidRule, []rule_tester.ValidTestCase{
-		// Fire-and-forget, spelled both ways the language offers.
 		{
 			Code: `
         export interface PledgeInstrumentation {
@@ -22,8 +21,6 @@ func TestDomainProbeReturnsVoid(t *testing.T) {
       `,
 			FileName: inApplicationPorts,
 		},
-		// A persistence port is not a probe, and its `Promise<void>` is an
-		// acknowledgement the caller is meant to wait for.
 		{
 			Code: `
         export interface PledgePersistence {
@@ -32,8 +29,6 @@ func TestDomainProbeReturnsVoid(t *testing.T) {
       `,
 			FileName: inApplicationPorts,
 		},
-		// The gate: outside the ports tree (default file name `file.ts`) the
-		// rule reports nothing, however answering the probe is.
 		{
 			Code: `
         export interface PledgeInstrumentation {
@@ -42,7 +37,6 @@ func TestDomainProbeReturnsVoid(t *testing.T) {
       `,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A probe that answers is a probe the caller can now depend on.
 		{
 			Code: `
         export interface PledgeInstrumentation {
@@ -52,8 +46,6 @@ func TestDomainProbeReturnsVoid(t *testing.T) {
 			FileName: inApplicationPorts,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "probeMemberReturnsValue"}},
 		},
-		// The recorded gap: the answer is behind an alias, which a syntactic rule
-		// reads as `void`.
 		{
 			Code: `
         type Acknowledged = Promise<void>
@@ -64,7 +56,6 @@ func TestDomainProbeReturnsVoid(t *testing.T) {
 			FileName: inApplicationPorts,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "probeMemberReturnsValue"}},
 		},
-		// Two answering members, reported once: the keyword is settled by the first.
 		{
 			Code: `
         export interface PledgeInstrumentation {

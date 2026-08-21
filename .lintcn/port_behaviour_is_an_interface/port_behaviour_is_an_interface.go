@@ -35,12 +35,6 @@ func buildBehaviourContractAsTypeAliasMessage(name string, member string) rule.R
 	}
 }
 
-// readableAsWritten reports whether `port-contract-is-an-interface` already
-// judges this declaration. That rule reads a written `TSFunctionType` on an
-// exported alias, so a callable spelled out in place is its diagnostic, not
-// ours — both firing made one mistake produce two sentences saying the same
-// thing. Everything it cannot see is still this rule's: an alias, an
-// intersection, and any declaration it never opens.
 func readableAsWritten(node *ast.Node, written *ast.Node) bool {
 	if !ast.HasSyntacticModifier(node, ast.ModifierFlagsExport) {
 		return false
@@ -67,9 +61,6 @@ func isCallable(c *checker.Checker, t *checker.Type) bool {
 }
 
 var PortBehaviourIsAnInterfaceRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "port-behaviour-is-an-interface",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "port-behaviour-is-an-interface")
@@ -97,15 +88,10 @@ var PortBehaviourIsAnInterfaceRule = rule.Rule{
 					return
 				}
 
-				// Only a declared object or intersection carries members of its own.
-				// A primitive's apparent type carries `String.prototype`, whose
-				// methods are callable and none of this repository's business.
 				if !utils.IsTypeFlagSet(declared, checker.TypeFlagsObject|checker.TypeFlagsIntersection) {
 					return
 				}
 
-				// One report per alias: the first callable member is enough to
-				// settle which keyword the declaration should have used.
 				for _, member := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, declared) {
 					if isCallable(ctx.TypeChecker, checker.Checker_getTypeOfSymbol(ctx.TypeChecker, member)) {
 						ctx.ReportNode(node, buildBehaviourContractAsTypeAliasMessage(alias, member.Name))

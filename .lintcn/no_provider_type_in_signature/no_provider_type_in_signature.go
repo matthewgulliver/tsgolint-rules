@@ -14,9 +14,6 @@ import (
 	"github.com/typescript-eslint/tsgolint/lintcn-rules/archkit"
 )
 
-// The inside, not the whole tree. `**/hexagon/**` also matched
-// `hexagon/adapters/**`, where a transport type is the adapter's entire job —
-// so this rule condemned a driving adapter for touching a `Response`.
 var defaultFiles = []string{
 	"**/hexagon/application/**",
 	"**/hexagon/domain/**",
@@ -81,17 +78,6 @@ func buildUnbrandedPrincipalMessage(parameter string) rule.RuleMessage {
 	}
 }
 
-// isBranded reports whether a type carries a property keyed by a unique symbol
-// this repository declares — the mark a caller cannot forge, because the symbol
-// is not exported.
-//
-// The key is judged, not the value: the brand property's own type is `true`,
-// and it is the computed key that makes the shape unassemblable.
-//
-// The declaring file has to be judged too. `string` carries `[Symbol.iterator]`
-// from `lib.es2015.iterable.d.ts`, which is a unique-symbol key and would make
-// a bare id read as branded — the recorded way this arm stopped enforcing
-// anything.
 func isBranded(c *checker.Checker, t *checker.Type) bool {
 	if t == nil {
 		return false
@@ -116,12 +102,6 @@ func isBranded(c *checker.Checker, t *checker.Type) bool {
 	return false
 }
 
-// reportable decides whether a written type name resolves to something a
-// package dependency declares nominally.
-//
-// A type alias is deliberately not reportable: `z.infer<typeof Schema>` is
-// declared in `node_modules` and describes a shape this repository owns, and
-// flagging it would make every schema-derived command a violation.
 func reportable(declaration *ast.Node) bool {
 	switch declaration.Kind {
 	case ast.KindClassDeclaration, ast.KindInterfaceDeclaration:
@@ -132,9 +112,6 @@ func reportable(declaration *ast.Node) bool {
 	}
 }
 
-// notOurs reports whether a declaration belongs to the platform or a package
-// rather than this repository, which is what separates the transport `Request`
-// from a domain type that happens to share its name.
 func notOurs(declaration *ast.Node) bool {
 	sourceFile := ast.GetSourceFileOfNode(declaration)
 	if sourceFile == nil {
@@ -163,25 +140,18 @@ func matchesAny(patterns []*regexp.Regexp, name string) bool {
 	return false
 }
 
-// A finding is one written type name that puts a signature outside the
-// hexagon's own vocabulary, and which of the two arms saw it.
 type finding struct {
 	name      string
 	transport bool
 }
 
 var NoProviderTypeInSignatureRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "no-provider-type-in-signature",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "no-provider-type-in-signature")
 		principals := compileAll(opts.principalPatterns())
 		transports := compileAll(opts.transportPatterns())
 
-		// judge returns the first written name in an annotation that resolves
-		// to a vendor's nominal type or the platform's transport type.
 		judge := func(annotation *ast.Node) (finding, bool) {
 			for _, written := range archkit.TypeReferenceNames(annotation) {
 				symbol := ctx.TypeChecker.GetSymbolAtLocation(written)
@@ -235,10 +205,6 @@ var NoProviderTypeInSignatureRule = rule.Rule{
 				if parameter.Type == nil || parameter.Name() == nil {
 					return
 				}
-				// A destructured parameter has no single name. Its declared
-				// type is still the signature's, so the vendor question is
-				// asked the same way; the principal-name question cannot be,
-				// and asking for the name anyway took the whole run down.
 				name := ""
 				subject := "A destructured parameter"
 				if given := parameter.Name(); given.Kind == ast.KindIdentifier {

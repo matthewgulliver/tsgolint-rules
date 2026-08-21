@@ -23,7 +23,6 @@ func TestGated(t *testing.T) {
 		return rule.RuleListeners{}
 	})
 
-	// The default test file name matches no e2e tree, so the rule must not run.
 	if listeners := gated(rule.RuleContext{}, nil); listeners != nil {
 		t.Errorf("out-of-scope file got listeners %v, want nil", listeners)
 	}

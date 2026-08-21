@@ -59,7 +59,6 @@ func TestOutsideDependency(t *testing.T) {
 		{"/usr/lib/typescript/lib.dom.d.ts", true},
 		{"/usr/lib/typescript/lib.es2022.d.ts", true},
 		{"/repo/packages/gifting/hexagon/domain/src/occasion.ts", false},
-		// A repository file merely mentioning the word is ours.
 		{"/repo/src/node_modules_report.ts", false},
 	}
 

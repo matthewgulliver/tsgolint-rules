@@ -60,9 +60,6 @@ func contains(values []string, wanted string) bool {
 }
 
 var NoDoubleLibraryInUseCaseTestRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "no-double-library-in-use-case-test",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "no-double-library-in-use-case-test")

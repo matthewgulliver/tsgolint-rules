@@ -35,9 +35,6 @@ func isPlaywrightPage(ctx rule.RuleContext, expression *ast.Node) bool {
 }
 
 var NoPageRequestInJourneyRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "no-page-request-in-journey",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, _ any) rule.RuleListeners {
 		return rule.RuleListeners{

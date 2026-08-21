@@ -14,8 +14,6 @@ import (
 
 var defaultFiles = []string{"**/hexagon/domain/**"}
 
-// The trees a domain signature may name. The shared kernel is here because
-// `Money` is the domain's own vocabulary, published one level up.
 var defaultOwnFiles = []string{"**/hexagon/domain/**", "**/shared-kernel/**"}
 
 type Options struct {
@@ -48,8 +46,6 @@ func buildForeignReturnTypeMessage(name string, written string, source string) r
 	}
 }
 
-// where names the tree a foreign declaration came from, so the diagnostic says
-// which boundary was crossed rather than only that one was.
 func where(file string) string {
 	if archkit.IsPackageDependency(file) {
 		return "a package dependency"
@@ -57,17 +53,6 @@ func where(file string) string {
 	return "`" + file + "`"
 }
 
-// reportable decides whether one declaration of a written type name puts that
-// name outside the domain's own vocabulary.
-//
-// A type alias declared by a package dependency is deliberately excused, on the
-// precedent `no-provider-type-in-signature` already records: `z.infer<typeof
-// Schema>` is declared in `node_modules` and describes a shape this repository
-// owns, and flagging it would make every schema-derived domain type a
-// violation. A class or interface from a dependency is nominal and is not
-// excused. Everything this repository itself declares outside the allowed trees
-// is reportable whichever way it is spelled — an application port is a port
-// whether it is written `interface` or `type`.
 func reportable(declaration *ast.Node, own []string) bool {
 	sourceFile := ast.GetSourceFileOfNode(declaration)
 	if sourceFile == nil {
@@ -75,9 +60,6 @@ func reportable(declaration *ast.Node, own []string) bool {
 	}
 	file := sourceFile.FileName()
 
-	// The language itself is not foreign: `aggregate-root.md` holds
-	// `readonly pledgedAt: Date`, and without this the rule flags every domain
-	// type in the repository.
 	if archkit.IsStandardLibrary(file) {
 		return false
 	}
@@ -92,16 +74,11 @@ func reportable(declaration *ast.Node, own []string) bool {
 }
 
 var DomainSignatureStaysInTheDomainRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "domain-signature-stays-in-the-domain",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "domain-signature-stays-in-the-domain")
 		own := opts.ownPatterns()
 
-		// foreign returns the first declaring file that puts a written type
-		// name outside the domain's vocabulary, and whether one was found.
 		foreign := func(written *ast.Node) (string, bool) {
 			symbol := ctx.TypeChecker.GetSymbolAtLocation(written)
 			if symbol == nil {
@@ -166,7 +143,6 @@ var DomainSignatureStaysInTheDomainRule = rule.Rule{
 	}),
 }
 
-// A `const` carries its `export` on the statement, two nodes up.
 func exported(node *ast.Node) *ast.Node {
 	list := node.Parent
 	if list == nil || list.Parent == nil {

@@ -22,9 +22,6 @@ func buildAnswerlessDomainFunctionMessage(name string) rule.RuleMessage {
 	}
 }
 
-// finalReturn follows a curried chain to the type its last call answers with.
-// `Promise` is deliberately not unwrapped: the domain is synchronous, and
-// waiting is `no-async-in-domain`'s subject.
 func finalReturn(c *checker.Checker, t *checker.Type) *checker.Type {
 	for range 8 {
 		signatures := archkit.CallSignatures(c, t)
@@ -36,9 +33,6 @@ func finalReturn(c *checker.Checker, t *checker.Type) *checker.Type {
 	return t
 }
 
-// answerless is true only when every constituent carries no answer. A lookup
-// returning `Occasion | undefined` answers "not found", and is not this rule's
-// subject.
 func answerless(t *checker.Type) bool {
 	if t == nil {
 		return false
@@ -52,17 +46,12 @@ func answerless(t *checker.Type) bool {
 }
 
 var DomainFunctionReturnsAnAnswerRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "domain-function-returns-an-answer",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, _ any) rule.RuleListeners {
 		judge := func(node *ast.Node, function *ast.Node, name *ast.Node) {
 			if name == nil || !ast.HasSyntacticModifier(exported(node), ast.ModifierFlagsExport) {
 				return
 			}
-			// A written return type is `no-void-return-in-domain`'s subject;
-			// this rule judges only what was left to inference.
 			if function.Type() != nil {
 				return
 			}
@@ -84,7 +73,6 @@ var DomainFunctionReturnsAnAnswerRule = rule.Rule{
 	}),
 }
 
-// A `const` carries its `export` on the statement, two nodes up.
 func exported(node *ast.Node) *ast.Node {
 	if node.Kind != ast.KindVariableDeclaration {
 		return node

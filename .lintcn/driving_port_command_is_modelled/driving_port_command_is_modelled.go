@@ -16,8 +16,6 @@ import (
 
 var defaultFiles = []string{"**/ports/**"}
 
-// The driving doc prefers a `For…` intention name. The rule does not require
-// one — it uses it only to find the declarations it judges.
 var defaultDrivingPortPatterns = []string{"^For"}
 
 type Options struct {
@@ -33,9 +31,6 @@ func buildUnmodelledCommandMessage(port string, member string, parameter string)
 	}
 }
 
-// A primitive with nothing added. A branded `ContributorId` is an
-// intersection, and a literal union is a modelled vocabulary; neither is bare,
-// and no syntactic rule can tell them from `string`.
 func isBarePrimitive(t *checker.Type) bool {
 	return utils.IsTypeFlagSet(t, checker.TypeFlagsString|checker.TypeFlagsNumber|
 		checker.TypeFlagsBoolean|checker.TypeFlagsAny|checker.TypeFlagsUnknown) &&
@@ -54,9 +49,6 @@ func compile(patterns []string) []*regexp.Regexp {
 }
 
 var DrivingPortCommandIsModelledRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "driving-port-command-is-modelled",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "driving-port-command-is-modelled")

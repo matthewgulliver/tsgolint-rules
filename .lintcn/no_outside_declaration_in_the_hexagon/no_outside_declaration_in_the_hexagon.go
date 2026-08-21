@@ -46,17 +46,11 @@ func buildOutsideModuleImportedMessage(file string) rule.RuleMessage {
 }
 
 var NoOutsideDeclarationInTheHexagonRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "no-outside-declaration-in-the-hexagon",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "no-outside-declaration-in-the-hexagon")
 		outside := opts.outsidePatterns()
 
-		// outsideFile names the first declaring file of a symbol that sits in an
-		// outside tree. A package dependency never counts, whatever its path
-		// happens to contain.
 		outsideFile := func(symbol *ast.Symbol) (string, bool) {
 			if symbol == nil {
 				return "", false

@@ -16,7 +16,6 @@ var defaultFiles = []string{"**/hexagon/domain/**", "**/shared-kernel/**"}
 
 var defaultMutableCollectionTypeNames = []string{"Array", "Map", "Set"}
 
-// The containers whose element types are still domain state worth following.
 var traversedContainerNames = map[string]bool{
 	"Array": true, "ReadonlyArray": true,
 	"Map": true, "ReadonlyMap": true,
@@ -54,7 +53,6 @@ func buildMutableCollectionResolvedMessage(path string, collection string) rule.
 	}
 }
 
-// owner is the interface, type alias or class declaration a node sits inside.
 func owner(node *ast.Node) *ast.Node {
 	for current := node; current != nil; current = current.Parent {
 		switch current.Kind {
@@ -73,9 +71,6 @@ func repositoryOwned(file string) bool {
 	return !archkit.IsStandardLibrary(file) && !archkit.IsPackageDependency(file)
 }
 
-// writtenCollection mirrors the syntactic rule's reading of a member's
-// annotation: a `T[]`, or a reference named for a mutable container, is
-// already `domain-state-is-readonly`'s to report.
 func writtenCollection(node *ast.Node, names map[string]bool) bool {
 	if node == nil {
 		return false
@@ -120,9 +115,6 @@ func symbolName(t *checker.Type) string {
 }
 
 var DomainStateIsDeeplyReadonlyRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "domain-state-is-deeply-readonly",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "domain-state-is-deeply-readonly")
@@ -183,8 +175,6 @@ var DomainStateIsDeeplyReadonlyRule = rule.Rule{
 						memberPath := path + "." + property.Name
 						container := owner(propertyDeclaration)
 						inside := container == declaration
-						// A member of another exported declaration is judged
-						// when that declaration is visited, not here.
 						if !inside && isExported(container) {
 							continue
 						}

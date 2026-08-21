@@ -12,7 +12,6 @@ const inPorts = "packages/gifting/hexagon/application/src/ports/occasion-dashboa
 func TestReadPortReturnsAnAnswer(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &ReadPortReturnsAnAnswerRule, []rule_tester.ValidTestCase{
-		// A read that answers with rows.
 		{
 			Code: `
         type OccasionDashboardRow = { readonly occasionId: string }
@@ -22,7 +21,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// A write port is allowed to answer with nothing.
 		{
 			Code: `
         export interface PledgePersistence {
@@ -31,7 +29,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// An answer that may be absent is still an answer.
 		{
 			Code: `
         export interface OccasionDashboardView {
@@ -40,7 +37,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// An unexported local type is no contract another module depends on.
 		{
 			Code: `
         interface OccasionDashboardRows {
@@ -49,8 +45,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
       `,
 			FileName: inPorts,
 		},
-		// The gate: outside the ports tree (default file name `file.ts`) the
-		// rule reports nothing, however answerless the read is.
 		{
 			Code: `
         export interface OccasionDashboardRows {
@@ -59,7 +53,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
       `,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A configured `files` scope replaces the default tree.
 		{
 			Code: `
         export interface OccasionDashboardRows {
@@ -69,8 +62,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
 			FileName: inPorts,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "answerlessRead"}},
 		},
-		// The alias the syntactic rule cannot follow: the annotation says
-		// `Acknowledged`, the type says nothing at all.
 		{
 			Code: `
         type Acknowledged = Promise<void>
@@ -81,8 +72,6 @@ func TestReadPortReturnsAnAnswer(t *testing.T) {
 			FileName: inPorts,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "answerlessRead"}},
 		},
-		// A member whose name carries no write verb at all, so the JS rule is
-		// silent on it.
 		{
 			Code: `
         export interface ContributorDashboard {

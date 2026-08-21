@@ -22,7 +22,6 @@ var vitest = map[string]string{
 func TestNoDoubleLibraryInUseCaseTest(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoDoubleLibraryInUseCaseTestRule, []rule_tester.ValidTestCase{
-		// The doc's own answer: a stateful in-memory fake, hand-written.
 		{
 			Code: `
         type PledgePersistence = { save(occasion: { id: string }): Promise<void> }
@@ -34,7 +33,6 @@ func TestNoDoubleLibraryInUseCaseTest(t *testing.T) {
       `,
 			FileName: inUseCaseTest,
 		},
-		// A local `vi` is not the library, which only the declaration says.
 		{
 			Code: `
         const vi = { fn: () => "a hand-written double" }
@@ -42,9 +40,6 @@ func TestNoDoubleLibraryInUseCaseTest(t *testing.T) {
       `,
 			FileName: inUseCaseTest,
 		},
-		// The gate: a file outside the application test tree (default file name
-		// `file.ts`) reports nothing, however much double-library scaffolding it
-		// carries.
 		{
 			Code: `
         import { vi } from "vitest"
@@ -53,7 +48,6 @@ func TestNoDoubleLibraryInUseCaseTest(t *testing.T) {
 			Files: vitest,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A mock standing in for the port the use-case test exists to exercise.
 		{
 			Code: `
         import { vi } from "vitest"
@@ -63,7 +57,6 @@ func TestNoDoubleLibraryInUseCaseTest(t *testing.T) {
 			Files:    vitest,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "doubleLibrary"}},
 		},
-		// An alias hides the name, never the declaration.
 		{
 			Code: `
         import { vi as doubles } from "vitest"
@@ -73,7 +66,6 @@ func TestNoDoubleLibraryInUseCaseTest(t *testing.T) {
 			Files:    vitest,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "doubleLibrary"}},
 		},
-		// Module mocking a port, in a `.tsx` use-case test.
 		{
 			Code: `
         import { vi } from "vitest"

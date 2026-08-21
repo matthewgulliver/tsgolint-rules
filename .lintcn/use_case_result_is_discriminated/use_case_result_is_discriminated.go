@@ -20,10 +20,6 @@ type Options struct {
 	FailureReasonMemberPatterns []string `json:"failureReasonMemberPatterns,omitempty"`
 }
 
-// `reason` is deliberately not a default: `bounded-context.md` and
-// `domain-probe.md` declare `reason: string` in their own Perfect Examples.
-// `errors` is not one either: it is RFC 9457's validation-error array, which
-// `api-design/resources/problem-details.md:51-54` endorses by example.
 var defaultFailureReasonMemberPatterns = []string{"^error$", "^violations$", "^faults$", "^problems$"}
 
 func (o Options) failureReasonPatterns() []string {
@@ -41,8 +37,6 @@ func buildUndiscriminatedResultMessage(name string) rule.RuleMessage {
 	}
 }
 
-// The outcome a caller finally receives: a curried use case returns a function,
-// and the union this rule judges is behind the last call.
 func buildGenericFailureReasonMessage(name string, member string) rule.RuleMessage {
 	return rule.RuleMessage{
 		Id:          "genericFailureReason",
@@ -51,9 +45,6 @@ func buildGenericFailureReasonMessage(name string, member string) rule.RuleMessa
 	}
 }
 
-// An array of unconstrained strings is the same failure once per element, so
-// the elements decide as much as the type itself does. The bound stops a
-// self-referential element type from recurring without end.
 func admitsAnyString(c *checker.Checker, t *checker.Type) bool {
 	return admitsAnyStringWithin(c, t, 0)
 }
@@ -75,8 +66,6 @@ func admitsAnyStringWithin(c *checker.Checker, t *checker.Type, depth int) bool 
 	return false
 }
 
-// genericFailureReasons names the members of a result whose resolved type
-// admits any `string`, each once, however many shapes carry them.
 func genericFailureReasons(c *checker.Checker, returned *checker.Type, patterns []*regexp.Regexp) []string {
 	seen := map[string]bool{}
 	names := make([]string, 0, 1)
@@ -122,8 +111,6 @@ func isLiteral(t *checker.Type) bool {
 		checker.TypeFlagsBooleanLiteral|checker.TypeFlagsUniqueESSymbol)
 }
 
-// Nullish members are an absence, not an outcome shape; a `Row | null` return
-// is not the shape this rule is about.
 func outcomeShapes(t *checker.Type) []*checker.Type {
 	shapes := make([]*checker.Type, 0, 4)
 	for _, constituent := range archkit.Constituents(t) {
@@ -159,9 +146,6 @@ func discriminated(c *checker.Checker, shapes []*checker.Type) bool {
 }
 
 var UseCaseResultIsDiscriminatedRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "use-case-result-is-discriminated",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "use-case-result-is-discriminated")
@@ -202,7 +186,6 @@ var UseCaseResultIsDiscriminatedRule = rule.Rule{
 	}),
 }
 
-// A `const` carries its `export` on the statement, two nodes up.
 func exported(node *ast.Node) *ast.Node {
 	if node.Kind != ast.KindVariableDeclaration {
 		return node

@@ -13,9 +13,6 @@ import (
 
 var defaultFiles = []string{"**/adapters/driven/**"}
 
-// Where a persistence row type is declared. The row is the adapter's own
-// vocabulary — `no-row-type-in-domain` is the rule that keeps it there — so a
-// discriminant reaching one is a discriminant read out of the database.
 var defaultRowTypeFiles = []string{"**/adapters/driven/**"}
 
 type Options struct {
@@ -47,12 +44,6 @@ func buildStoredStateDefaultDoesNotThrowMessage(discriminant string) rule.RuleMe
 	}
 }
 
-// discriminantOfARow reports whether a switch is deciding on a property of a
-// type a persistence adapter declares, and names the property.
-//
-// This is the whole reason the rule is type-aware. `switch (row.state)` and
-// `switch (command.state)` are the same syntax; only the resolved type of the
-// thing being read says which of them came out of the database.
 func discriminantOfARow(ctx rule.RuleContext, expression *ast.Node, rowTypes []string) (string, bool) {
 	if expression == nil || expression.Kind != ast.KindPropertyAccessExpression {
 		return "", false
@@ -73,8 +64,6 @@ func discriminantOfARow(ctx rule.RuleContext, expression *ast.Node, rowTypes []s
 	return "", false
 }
 
-// throws reports whether a clause's statements reach a `throw`, including one
-// inside the block a `never`-binding default is usually written as.
 func throws(clause *ast.Node) bool {
 	found := false
 	var walk func(node *ast.Node) bool
@@ -86,7 +75,6 @@ func throws(clause *ast.Node) bool {
 			found = true
 			return true
 		}
-		// A nested function's `throw` is not this clause's.
 		if ast.IsFunctionLike(node) {
 			return false
 		}
@@ -98,9 +86,6 @@ func throws(clause *ast.Node) bool {
 }
 
 var StoredStateSwitchHasAThrowingDefaultRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "stored-state-switch-has-a-throwing-default",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
 		opts := utils.UnmarshalOptions[Options](options, "stored-state-switch-has-a-throwing-default")

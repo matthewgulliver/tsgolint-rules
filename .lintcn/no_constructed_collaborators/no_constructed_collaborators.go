@@ -25,9 +25,6 @@ func buildProviderConstructionMessage(name string, source string) rule.RuleMessa
 }
 
 var NoConstructedCollaboratorsRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
 	Name: "no-constructed-collaborators",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, _ any) rule.RuleListeners {
 		return rule.RuleListeners{
@@ -37,23 +34,14 @@ var NoConstructedCollaboratorsRule = rule.Rule{
 					return
 				}
 
-				// A construction over anything but a written name — a call, an
-				// element access — cannot be reported by name, and naming it
-				// is half of what this message says.
 				name := archkit.WrittenName(constructed)
 				if name == "" {
 					return
 				}
 
-				// The constructed value's own type, not the instance's: a
-				// class's declaration is what says who wrote it.
 				constructedType := ctx.TypeChecker.GetTypeAtLocation(constructed)
 
 				for _, file := range archkit.DeclaringFiles(constructedType) {
-					// Only an installed package. `new Date()`, `new Map()` and
-					// `new URL()` are declared in `lib.*.d.ts` and are values,
-					// not collaborators — banning them is the recorded reason
-					// the syntactic version of this rule was dropped.
 					if archkit.IsPackageDependency(file) {
 						ctx.ReportNode(node, buildProviderConstructionMessage(
 							name, "a package dependency"))

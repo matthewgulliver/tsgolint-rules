@@ -10,8 +10,6 @@ import (
 const inDomain = "packages/gifting/hexagon/domain/src/occasions/occasion.ts"
 const inKernel = "packages/shared-kernel/src/money.ts"
 
-// An ambient module, the shape many `@types` packages take: nothing inside
-// carries an `export` keyword, so only the declaring file says it is a vendor's.
 var vendor = map[string]string{
 	"node_modules/decimal.js/index.d.ts": `
     declare module "decimal.js" {
@@ -23,7 +21,6 @@ var vendor = map[string]string{
 func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &DomainStateIsDeeplyReadonlyRule, []rule_tester.ValidTestCase{
-		// Readonly all the way down through the alias.
 		{
 			Code: `
         type PledgeList = ReadonlyArray<{ readonly id: string }>
@@ -32,19 +29,14 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// A member written mutable in the declaration itself is
-		// `domain-state-is-readonly`'s to report, not this rule's.
 		{
 			Code:     `export type Occasion = { id: string; pledges: string[]; tags: Array<string> }`,
 			FileName: inDomain,
 		},
-		// A member annotated with the `readonly` type operator is not a written
-		// mutable collection either, and the operator arm proves it.
 		{
 			Code:     `export type Occasion = { readonly tags: readonly string[] }`,
 			FileName: inDomain,
 		},
-		// A dependency's members are not this repository's state.
 		{
 			Code: `
         import { Decimal } from "decimal.js"
@@ -53,12 +45,10 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inKernel,
 			Files:    vendor,
 		},
-		// The standard library's own writable members are not the model's.
 		{
 			Code:     `export type Occasion = { readonly pattern: RegExp; readonly at: Date }`,
 			FileName: inDomain,
 		},
-		// Behaviour is not state.
 		{
 			Code: `
         type Rules = { settle: (id: string) => string; readonly limit: number }
@@ -66,13 +56,10 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// Recursion terminates on a self-referential type.
 		{
 			Code:     `export type Tree = { readonly value: number; readonly children: ReadonlyArray<Tree> }`,
 			FileName: inDomain,
 		},
-		// Another exported declaration is judged when it is visited, not
-		// through every type that names it.
 		{
 			Code: `
         export type FundingState = { readonly pledges: ReadonlyArray<string> }
@@ -80,7 +67,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// Not exported, so not the model's published state.
 		{
 			Code: `
         type PledgeList = string[]
@@ -88,9 +74,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
       `,
 			FileName: inDomain,
 		},
-		// The gate: outside the domain and shared-kernel trees (default file
-		// name `file.ts`) the rule reports nothing, however writable the state
-		// nested under the root is.
 		{
 			Code: `
         type FundingState = { pledges: ReadonlyArray<string> }
@@ -98,7 +81,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
       `,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// A member reached through a named type is writable.
 		{
 			Code: `
         type FundingState = { pledges: ReadonlyArray<string>; readonly closed: boolean }
@@ -107,7 +89,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableMemberResolved"}},
 		},
-		// An alias resolving to a mutable array.
 		{
 			Code: `
         type PledgeList = string[]
@@ -116,7 +97,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableCollectionResolved"}},
 		},
-		// The same alias, one level down.
 		{
 			Code: `
         type PledgeList = Array<string>
@@ -126,7 +106,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableCollectionResolved"}},
 		},
-		// A `Map` behind an alias, in a union with undefined.
 		{
 			Code: `
         type Index = Map<string, number>
@@ -135,7 +114,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableCollectionResolved"}},
 		},
-		// The element type of a readonly collection is still state.
 		{
 			Code: `
         type Pledge = { amount: number }
@@ -144,7 +122,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableMemberResolved"}},
 		},
-		// The shared kernel is judged too.
 		{
 			Code: `
         type Minor = { units: number }
@@ -153,8 +130,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inKernel,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableMemberResolved"}},
 		},
-		// Reported once, at the declaration that owns the member: `Occasion`
-		// does not repeat what `FundingState`'s own visit already said.
 		{
 			Code: `
         type PledgeList = string[]
@@ -164,7 +139,6 @@ func TestDomainStateIsDeeplyReadonly(t *testing.T) {
 			FileName: inDomain,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "mutableCollectionResolved"}},
 		},
-		// Configured collection names.
 		{
 			Code: `
         type Bag = Set<string>

@@ -9,7 +9,6 @@ import (
 
 const inDomain = "packages/gifting/hexagon/domain/src/pledges/pledge-contribution.ts"
 
-// The three trees a domain signature may reach into, and the one it may not.
 var trees = map[string]string{
 	"packages/gifting/hexagon/domain/src/occasions/occasion.ts": `
     export type Occasion = { readonly id: string }
@@ -35,8 +34,6 @@ var trees = map[string]string{
 func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &DomainSignatureStaysInTheDomainRule, []rule_tester.ValidTestCase{
-		// domain-service.md's Perfect Example signature: domain values in,
-		// a domain decision out.
 		{
 			Code: `
         import type { Occasion, PledgeDecision } from "../occasions/occasion"
@@ -49,8 +46,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			FileName: inDomain,
 			Files:    trees,
 		},
-		// The trap the ledger named: the standard library is not foreign.
-		// aggregate-root.md holds `readonly pledgedAt: Date`.
 		{
 			Code: `
         import type { Occasion } from "../occasions/occasion"
@@ -63,8 +58,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			FileName: inDomain,
 			Files:    trees,
 		},
-		// A package dependency's *type alias* is excused, on the precedent
-		// `no-provider-type-in-signature` records for `z.infer<typeof Schema>`.
 		{
 			Code: `
         import type { Infer } from "stripe"
@@ -74,7 +67,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			FileName: inDomain,
 			Files:    trees,
 		},
-		// Not exported, so not part of the model's published vocabulary.
 		{
 			Code: `
         import type { PledgePersistence } from "../../../application/src/ports/pledge-persistence"
@@ -83,8 +75,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			FileName: inDomain,
 			Files:    trees,
 		},
-		// The gate: outside the domain tree (default file name `file.ts`) the
-		// rule reports nothing, however foreign the signature is.
 		{
 			Code: `
         import type { PledgePersistence } from "./ports/pledge-persistence"
@@ -95,9 +85,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			Files: trees,
 		},
 	}, []rule_tester.InvalidTestCase{
-		// The claim: an application port is not a domain value, and no shipped
-		// rule sees it — `no-application-port-in-domain` judges declarations in
-		// the domain tree, not references to one declared elsewhere.
 		{
 			Code: `
         import type { PledgePersistence } from "../../../application/src/ports/pledge-persistence"
@@ -111,8 +98,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			Files:    trees,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "foreignParameterType"}},
 		},
-		// The return half, which `no-provider-type-in-signature` never reads:
-		// it visits parameters only.
 		{
 			Code: `
         import type { PledgeResult } from "../../../application/src/ports/pledge-persistence"
@@ -124,7 +109,6 @@ func TestDomainSignatureStaysInTheDomain(t *testing.T) {
 			Files:    trees,
 			Errors:   []rule_tester.InvalidTestCaseError{{MessageId: "foreignReturnType"}},
 		},
-		// A provider's nominal interface, reached through a generic argument.
 		{
 			Code: `
         import type { StripeCharge } from "stripe"
