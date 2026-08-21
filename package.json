@@ -1,5 +1,12 @@
 {
+  "type": "module",
+  "scripts": {
+    "new:rule": "plop rule"
+  },
   "dependencies": {
     "lintcn": "^0.10.1"
+  },
+  "devDependencies": {
+    "plop": "^4.0.5"
   }
 }

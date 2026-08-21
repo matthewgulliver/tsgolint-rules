@@ -1,0 +1,89 @@
+// lintcn:name {{name}}
+// lintcn:severity {{severity}}
+// lintcn:description {{description}}
+
+package {{packageName}}
+
+import (
+	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/typescript-eslint/tsgolint/internal/rule"
+{{#if hasOptions}}
+	"github.com/typescript-eslint/tsgolint/internal/utils"
+{{/if}}
+{{#if isGated}}
+	"github.com/typescript-eslint/tsgolint/lintcn-rules/archkit"
+{{/if}}
+)
+{{#if isGated}}
+
+var defaultFiles = []string{ {{{globs}}} }
+{{/if}}
+{{#if hasOptions}}
+
+type Options struct {
+	// TODO: name the option. A pointer distinguishes "unset" from the zero
+	// value; see port_behaviour_is_an_interface for a bool done this way.
+	Example *string `json:"example,omitempty"`
+}
+
+func (o Options) example() string {
+	if o.Example == nil {
+		return "TODO: the default"
+	}
+	return *o.Example
+}
+{{/if}}
+
+func build{{testName}}Message(name string) rule.RuleMessage {
+	return rule.RuleMessage{
+		Id: "{{messageId}}",
+		// The message says what is wrong and why it matters; Help says what to
+		// do instead. Both are read by an agent, so name the specific symbol.
+		Description: "`" + name + "` TODO: what is wrong, and what it costs.",
+		Help:        "TODO: the change that resolves it.",
+	}
+}
+
+var {{ruleVar}} = rule.Rule{
+	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
+	// bind the CLI name to this rule, so a const would silently desynchronize
+	// from lintcn:name above.
+	Name: "{{name}}",
+{{#if isGated}}
+	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
+{{else}}
+	Run: func(ctx rule.RuleContext, options any) rule.RuleListeners {
+{{/if}}
+{{#if hasOptions}}
+		opts := utils.UnmarshalOptions[Options](options, "{{name}}")
+		example := opts.example()
+		_ = example
+{{/if}}
+
+		return rule.RuleListeners{
+			// TODO: replace with the node kind this rule judges.
+			ast.KindTypeAliasDeclaration: func(node *ast.Node) {
+				declaration := node.AsTypeAliasDeclaration()
+				name := declaration.Name()
+				if name == nil {
+					return
+				}
+				if !isViolation(ctx, node) {
+					return
+				}
+
+				ctx.ReportNode(node, build{{testName}}Message(name.Text()))
+			},
+		}
+{{#if isGated}}
+	}),
+{{else}}
+	},
+{{/if}}
+}
+
+// isViolation is the whole rule. Everything above is wiring.
+func isViolation(_ rule.RuleContext, _ *ast.Node) bool {
+	// TODO: implement. Returning false is what makes the generated test RED.
+	return false
+}
