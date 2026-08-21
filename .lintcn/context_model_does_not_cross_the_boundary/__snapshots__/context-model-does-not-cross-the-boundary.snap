@@ -1,0 +1,60 @@
+
+[TestContextModelDoesNotCrossTheBoundary/invalid-0 - 1]
+Diagnostic 1: crossContextModelType (3:37 - 3:54)
+Message: `Occasion` is declared inside the `gifting` context's own internals, and this context's exported signature names it, so the two models are now one and a change to theirs is a change to yours.
+Help: Translate it at an Anti-Corruption Layer into a type this context declares, or take it from that context's published contract, which is the surface it agreed to keep stable.
+   2 |         import type { Occasion } from "../../../gifting/src/occasions/occasion"
+   3 |         export const remindAbout = (occasion: Occasion): string => occasion.id
+     |                                     ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestContextModelDoesNotCrossTheBoundary/invalid-1 - 1]
+Diagnostic 1: crossContextModelType (4:37 - 4:54)
+Message: `Occasion` is declared inside the `gifting` context's own internals, and this context's exported signature names it, so the two models are now one and a change to theirs is a change to yours.
+Help: Translate it at an Anti-Corruption Layer into a type this context declares, or take it from that context's published contract, which is the surface it agreed to keep stable.
+   3 |         import type { Schedule } from "./schedule"
+   4 |         export const remindAbout = (occasion: Occasion): Schedule =>
+     |                                     ~~~~~~~~~~~~~~~~~~
+   5 |           ({ at: occasion.id })
+---
+
+[TestContextModelDoesNotCrossTheBoundary/invalid-2 - 1]
+Diagnostic 1: crossContextModelType (3:21 - 3:28)
+Message: `Occasion` is declared inside the `gifting` context's own internals, and this context's exported signature names it, so the two models are now one and a change to theirs is a change to yours.
+Help: Translate it at an Anti-Corruption Layer into a type this context declares, or take it from that context's published contract, which is the surface it agreed to keep stable.
+   2 |         import type { Occasion } from "../../../gifting/public"
+   3 |         export type Reminder = { readonly about: Occasion }
+     |                     ~~~~~~~~
+   4 |       
+---
+
+[TestContextModelDoesNotCrossTheBoundary/invalid-3 - 1]
+Diagnostic 1: crossContextModelType (4:25 - 4:33)
+Message: `Occasion` is declared inside the `gifting` context's own internals, and this context's exported signature names it, so the two models are now one and a change to theirs is a change to yours.
+Help: Translate it at an Anti-Corruption Layer into a type this context declares, or take it from that context's published contract, which is the surface it agreed to keep stable.
+   3 |         import type { Schedule } from "./schedule"
+   4 |         export function subjectOf(schedule: Schedule): Occasion {
+     |                         ~~~~~~~~~
+   5 |           return { id: schedule.at }
+---
+
+[TestContextModelDoesNotCrossTheBoundary/invalid-4 - 1]
+Diagnostic 1: crossContextModelType (3:37 - 3:54)
+Message: `Occasion` is declared inside the `gifting` context's own internals, and this context's exported signature names it, so the two models are now one and a change to theirs is a change to yours.
+Help: Translate it at an Anti-Corruption Layer into a type this context declares, or take it from that context's published contract, which is the surface it agreed to keep stable.
+   2 |         import type { Occasion } from "../../../gifting/src/occasions/occasion"
+   3 |         export const remindAbout = (occasion: Occasion): string => occasion.id
+     |                                     ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestContextModelDoesNotCrossTheBoundary/invalid-5 - 1]
+Diagnostic 1: crossContextModelType (3:32 - 3:47)
+Message: `Voucher` is declared inside the `gifting` context's own internals, and this context's exported signature names it, so the two models are now one and a change to theirs is a change to yours.
+Help: Translate it at an Anti-Corruption Layer into a type this context declares, or take it from that context's published contract, which is the surface it agreed to keep stable.
+   2 |         import type { Voucher } from "../../../gifting/index"
+   3 |         export const codeOf = (voucher: Voucher): string => voucher.code
+     |                                ~~~~~~~~~~~~~~~~
+   4 |       
+---
