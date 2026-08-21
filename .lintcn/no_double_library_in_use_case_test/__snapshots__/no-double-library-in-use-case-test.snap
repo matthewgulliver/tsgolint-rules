@@ -1,0 +1,30 @@
+
+[TestNoDoubleLibraryInUseCaseTest/invalid-0 - 1]
+Diagnostic 1: doubleLibrary (3:37 - 3:41)
+Message: `fn` comes from a test-double library, so this use-case test doubles a driven port with library scaffolding rather than a hand-written fake, stub or spy that implements the port's real interface — a contract change no longer breaks at compile time.
+Help: Write the double as `createFake…`, `createStub…` or `createSpy…` in the doubles module, implementing the port interface, and assert on its state.
+   2 |         import { vi } from "vitest"
+   3 |         const persistence = { save: vi.fn() }
+     |                                     ~~~~~
+   4 |       
+---
+
+[TestNoDoubleLibraryInUseCaseTest/invalid-1 - 1]
+Diagnostic 1: doubleLibrary (3:9 - 3:21)
+Message: `spyOn` comes from a test-double library, so this use-case test doubles a driven port with library scaffolding rather than a hand-written fake, stub or spy that implements the port's real interface — a contract change no longer breaks at compile time.
+Help: Write the double as `createFake…`, `createStub…` or `createSpy…` in the doubles module, implementing the port interface, and assert on its state.
+   2 |         import { vi as doubles } from "vitest"
+   3 |         doubles.spyOn({}, "save")
+     |         ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoDoubleLibraryInUseCaseTest/invalid-2 - 1]
+Diagnostic 1: doubleLibrary (3:9 - 3:15)
+Message: `mock` comes from a test-double library, so this use-case test doubles a driven port with library scaffolding rather than a hand-written fake, stub or spy that implements the port's real interface — a contract change no longer breaks at compile time.
+Help: Write the double as `createFake…`, `createStub…` or `createSpy…` in the doubles module, implementing the port interface, and assert on its state.
+   2 |         import { vi } from "vitest"
+   3 |         vi.mock("./ports/pledge-persistence")
+     |         ~~~~~~~
+   4 |       
+---
