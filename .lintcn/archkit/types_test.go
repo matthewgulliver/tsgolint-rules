@@ -14,4 +14,19 @@ func TestNilInputsReturnNothingRatherThanPanic(t *testing.T) {
 	if got := DeclaringFilesOfSymbol(nil); got != nil {
 		t.Errorf("DeclaringFilesOfSymbol(nil) = %v, want nil", got)
 	}
+	if got := ElementTypes(nil, nil); got != nil {
+		t.Errorf("ElementTypes(nil, nil) = %v, want nil", got)
+	}
+	if got := Unwrapped(nil, nil); got != nil {
+		t.Errorf("Unwrapped(nil, nil) = %v, want nil", got)
+	}
+	if got := CallSignatures(nil, nil); got != nil {
+		t.Errorf("CallSignatures(nil, nil) = %v, want nil", got)
+	}
+	if got := Members(nil, nil); got != nil {
+		t.Errorf("Members(nil, nil) = %v, want nil", got)
+	}
+	if got := ReturnType(nil, nil); got != nil {
+		t.Errorf("ReturnType(nil, nil) = %v, want nil", got)
+	}
 }

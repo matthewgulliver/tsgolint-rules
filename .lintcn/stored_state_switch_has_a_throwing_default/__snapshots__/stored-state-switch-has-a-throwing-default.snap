@@ -1,0 +1,42 @@
+
+[TestStoredStateSwitchHasAThrowingDefault/invalid-0 - 1]
+Diagnostic 1: storedStateSwitchWithoutDefault (4:19 - 4:27)
+Message: This `switch` decides on `row.state`, which is read from a stored row, and has no `default`. Exhaustiveness over the row type proves nothing about the database, which may already hold a value the type denies.
+Help: Add a `default` that binds the discriminant to `never` and throws, so an unrecognised stored value fails loudly instead of returning `undefined` into the model.
+   3 |         export const toOccasion = (row: OccasionRow): string => {
+   4 |           switch (row.state) {
+     |                   ~~~~~~~~~
+   5 |             case "Open":
+---
+
+[TestStoredStateSwitchHasAThrowingDefault/invalid-1 - 1]
+Diagnostic 1: storedStateDefaultDoesNotThrow (7:13 - 8:30)
+Message: This `switch` decides on `row.state`, which is read from a stored row, and its `default` does not throw, so a row holding an unrecognised value is turned into a value the model accepts.
+Help: Throw from the `default`. A stored state the type denies is a corrupt row, not an outcome the model should be asked to represent.
+   6 |               return "open"
+   7 |             default:
+     |             ~~~~~~~~
+   8 |               return "settled"
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |           }
+---
+
+[TestStoredStateSwitchHasAThrowingDefault/invalid-2 - 1]
+Diagnostic 1: storedStateDefaultDoesNotThrow (7:13 - 12:13)
+Message: This `switch` decides on `row.state`, which is read from a stored row, and its `default` does not throw, so a row holding an unrecognised value is turned into a value the model accepts.
+Help: Throw from the `default`. A stored state the type denies is a corrupt row, not an outcome the model should be asked to represent.
+   6 |               return "open"
+   7 |             default: {
+     |             ~~~~~~~~~~
+   8 |               const explode = () => {
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   9 |                 throw new Error("nope")
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  10 |               }
+     | ~~~~~~~~~~~~~~~
+  11 |               return String(explode)
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  12 |             }
+     | ~~~~~~~~~~~~~
+  13 |           }
+---

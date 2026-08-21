@@ -25,9 +25,11 @@ func DeclaringFiles(t *checker.Type) []string {
 	symbol := checker.Type_symbol(t)
 	// The nil arms of this check and the sourceFile check below are exercised
 	// by the rule packages' rule_tester cases (an anonymous object-literal
-	// type has no symbol; a synthesized declaration has no source file).
-	// Gremlins cannot see that coverage cross-package, so the two surviving
-	// NOT COVERED mutants in this file are recorded as covered there.
+	// type has no symbol; a synthesized declaration has no source file), and
+	// so are the checker-dependent arms of the helpers below (a non-array
+	// type, an unawaited one). Gremlins cannot see that coverage
+	// cross-package, so the three surviving NOT COVERED mutants in this file
+	// are recorded as covered there.
 	if symbol == nil {
 		return nil
 	}
@@ -60,4 +62,67 @@ func Constituents(t *checker.Type) []*checker.Type {
 		return t.Types()
 	}
 	return []*checker.Type{t}
+}
+
+// ElementTypes returns the element types of an array or tuple, and nothing for
+// any other type. `readonly string[]` is a reference type rather than a
+// string-flagged one, so a rule reading only type flags finds no string in it.
+func ElementTypes(c *checker.Checker, t *checker.Type) []*checker.Type {
+	if t == nil || !checker.Checker_isArrayOrTupleType(c, t) {
+		return nil
+	}
+	return checker.Checker_getTypeArguments(c, t)
+}
+
+// Unwrapped resolves `Promise<T>` to `T`, and leaves a synchronous type alone.
+// Every port in this repository is async, so a rule that judges a return type
+// without this judges `Promise` instead.
+func Unwrapped(c *checker.Checker, t *checker.Type) *checker.Type {
+	if t == nil {
+		return nil
+	}
+	if awaited := checker.Checker_getAwaitedType(c, t); awaited != nil {
+		return awaited
+	}
+	return t
+}
+
+// CallSignatures returns a type's call signatures.
+func CallSignatures(c *checker.Checker, t *checker.Type) []*checker.Signature {
+	if t == nil {
+		return nil
+	}
+	return checker.Checker_getSignaturesOfType(c, t, checker.SignatureKindCall)
+}
+
+// Members returns a type's properties paired with their own types, which is
+// how both `{ save: (o) => void }` and `interface P { save(o): void }` are read
+// as the same contract.
+func Members(c *checker.Checker, t *checker.Type) []Member {
+	if t == nil {
+		return nil
+	}
+	properties := checker.Checker_getPropertiesOfType(c, t)
+	members := make([]Member, 0, len(properties))
+	for _, property := range properties {
+		members = append(members, Member{
+			Name: property.Name,
+			Type: checker.Checker_getTypeOfSymbol(c, property),
+		})
+	}
+	return members
+}
+
+// Member is one property of a declared contract.
+type Member struct {
+	Name string
+	Type *checker.Type
+}
+
+// ReturnType returns a signature's return type.
+func ReturnType(c *checker.Checker, signature *checker.Signature) *checker.Type {
+	if signature == nil {
+		return nil
+	}
+	return checker.Checker_getReturnTypeOfSignature(c, signature)
 }
