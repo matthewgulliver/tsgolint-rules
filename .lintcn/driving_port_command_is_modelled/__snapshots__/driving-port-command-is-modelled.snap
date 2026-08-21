@@ -1,0 +1,42 @@
+
+[TestDrivingPortCommandIsModelled/invalid-0 - 1]
+Diagnostic 1: unmodelledCommand (2:9 - 4:9)
+Message: `ForPledgingToOccasions.pledgeToOccasion` takes `occasionId` as a bare primitive, so every actor may pass any string of the right shape and the port carries no vocabulary of its own.
+Help: Take a declared command type, or a branded domain value, so the type says which value this is.
+   1 | 
+   2 |         export interface ForPledgingToOccasions {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           readonly pledgeToOccasion: (occasionId: string) => Promise<void>
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestDrivingPortCommandIsModelled/invalid-1 - 1]
+Diagnostic 1: unmodelledCommand (3:9 - 5:9)
+Message: `ForPledgingToOccasions.pledgeToOccasion` takes `occasionId` as a bare primitive, so every actor may pass any string of the right shape and the port carries no vocabulary of its own.
+Help: Take a declared command type, or a branded domain value, so the type says which value this is.
+   2 |         type OccasionId = string
+   3 |         export interface ForPledgingToOccasions {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           readonly pledgeToOccasion: (occasionId: OccasionId) => Promise<void>
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+     | ~~~~~~~~~
+   6 |       
+---
+
+[TestDrivingPortCommandIsModelled/invalid-2 - 1]
+Diagnostic 1: unmodelledCommand (2:9 - 4:9)
+Message: `DrivesPledging.pledge` takes `amount` as a bare primitive, so every actor may pass any string of the right shape and the port carries no vocabulary of its own.
+Help: Take a declared command type, or a branded domain value, so the type says which value this is.
+   1 | 
+   2 |         export interface DrivesPledging {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           readonly pledge: (amount: number) => Promise<void>
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
