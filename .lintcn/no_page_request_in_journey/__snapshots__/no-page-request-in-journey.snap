@@ -1,0 +1,20 @@
+
+[TestNoPageRequestInJourney/invalid-0 - 1]
+Diagnostic 1: pageRequest (4:9 - 4:20)
+Message: `page.request` uses Playwright's Node HTTP client, so this journey can stay green while the browser UI, cookie policy, and browser-generated request metadata are broken.
+Help: Create prerequisite state through a fixture seam, then drive the journey through accessible page locators and observe its browser-caused request.
+   3 |         declare const page: Page
+   4 |         page.request.post("/api/occasions")
+     |         ~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoPageRequestInJourney/invalid-1 - 1]
+Diagnostic 1: pageRequest (5:9 - 5:20)
+Message: `page.request` uses Playwright's Node HTTP client, so this journey can stay green while the browser UI, cookie policy, and browser-generated request metadata are broken.
+Help: Create prerequisite state through a fixture seam, then drive the journey through accessible page locators and observe its browser-caused request.
+   4 |         declare const page: JourneyPage
+   5 |         page.request.post("/api/occasions")
+     |         ~~~~~~~~~~~~
+   6 |       
+---

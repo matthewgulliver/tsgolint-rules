@@ -21,7 +21,7 @@ var playwright = map[string]string{
 
 func TestNoPageRequestInJourney(t *testing.T) {
 	t.Parallel()
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoPageRequestInJourneyRule.Rule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoPageRequestInJourneyRule, []rule_tester.ValidTestCase{
 		// A journey driving the browser, which is the whole point of the file.
 		{
 			Code: `

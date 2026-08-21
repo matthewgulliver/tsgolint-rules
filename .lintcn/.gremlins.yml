@@ -1,0 +1,10 @@
+# Gremlins mutation testing configuration
+# Docs: https://gremlins.dev/latest/configuration/
+unleash:
+  # Only mutate covered code; kill meaningful mutants per rule package.
+  # Run: gremlins unleash ./<rule_folder>
+  workers: 0 # auto = number of CPUs
+  timeout-coefficient: 2
+  # Keep default mutant set; enable logical operator inversion for rules with
+  # boolean-heavy logic.
+  invert-logical: true
