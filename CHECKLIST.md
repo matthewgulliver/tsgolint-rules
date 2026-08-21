@@ -19,7 +19,6 @@ Enforcement column. Items grounded in vendored source cite the file.
 | `VET` | `go vet ./...`. |
 | `GOFMT` | `gofmt -l .`. |
 | `CONV` | This repository's convention, encoded in the plop generator and the 19 existing rules. No tool enforces it; violating it is a review finding. |
-| `PERF` | Performance practice. Unmeasured — see *Known gaps*. |
 | `MUTATION` | The `gremlins unleash ./<rule>/` gate from `.agents/skills/go-tdd-mutation/SKILL.md`. |
 
 Sources per section. `SKILL.md` means `.agents/skills/lintcn/SKILL.md`; `PORT.md` means
@@ -77,7 +76,7 @@ All are optional. All are parsed by line regex `^// lintcn:(\w+) (.+)$` anywhere
 | # | Proposition (YES = intended) | Applies to | Enforcement |
 | --- | --- | --- | --- |
 | B1 | `// lintcn:name` is present and its value is byte-identical to the Go `Name:` literal. | every rule | CONV (they are independent: `name` drives `lintcn list` and the fallback, `Name:` drives diagnostics and `--warn`; a mismatch shows two different names for one rule) |
-| B2 | `// lintcn:severity` is written explicitly, even for `error`. | every rule | CONV (all 19 rules do this; PORT.md §6 says to omit it — see *Received wisdom*) |
+| B2 | `// lintcn:severity` is written explicitly, even for `error`. | every rule | CONV (all 19 rules and the generator do this; `error` is the parsed default but is still stated) |
 | B3 | The severity value is exactly `error` or `warn`, lowercase. | every rule | DISCOVERY (`meta.severity === 'warn' ? 'warn' : 'error'` — every other spelling, including `Warn` and `warning`, silently becomes `error`) |
 | B4 | The severity is `error` because the rule states an architectural invariant that must fail CI. | invariant rules | CONV |
 | B5 | The severity is `warn` because the rule is advisory guidance for newly written code. | advisory rules | CONV (16 rules are `error`; `no-page-request-in-journey`, `no-double-library-in-domain-test`, `no-double-library-in-use-case-test` are `warn`) |
@@ -267,19 +266,17 @@ Source: `.agents/skills/go-tdd-mutation/SKILL.md`; PORT.md §8.
 
 ---
 
-## L. Performance — *scope: the listener body*
+## L. Per-file execution model — *scope: the `Run` body*
 
 `RunLinterOnProgram` calls `r.Run(ctx)` once per file per rule, and every registered listener
 fires on every matching node in every file of the program. There is no per-rule enablement and
-no file filter outside the rule itself.
+no file filter outside the rule itself. Both items below follow from that; neither is a
+performance claim, because nothing here has been profiled — see *Known gaps*.
 
 | # | Proposition (YES = intended) | Applies to | Enforcement |
 | --- | --- | --- | --- |
-| L1 | A cheap syntactic guard runs before any checker call that the guard would make unnecessary. | every typed rule | PERF (`no_page_request_in_journey` tests `Name().Text() != "request"` before touching the checker) |
-| L2 | The gate is the first thing `Run` does, so an out-of-scope file registers no listeners at all. | gated rules | PERF + RUNTIME |
-| L3 | The listener is registered on the narrowest node kind that can carry the violation. | every rule | PERF |
-| L4 | Whole-program work is done once and cached, not per file. | rules with cross-file facts | PERF (`domain_type_is_declared_once`) |
-| L5 | Nothing expensive is allocated in the `Run` body outside the gate, since `Run` is called per file. | every rule | PERF |
+| L1 | The gate is the first thing `Run` does, so an out-of-scope file registers no listeners at all. | gated rules | RUNTIME |
+| L2 | Whole-program work is done once and cached, not per file. | rules with cross-file facts | RUNTIME (`domain_type_is_declared_once`) |
 
 ---
 
@@ -287,7 +284,6 @@ no file filter outside the rule itself.
 
 | Stale advice | Current state |
 | --- | --- |
-| PORT.md §6: "architectural invariants are `error` (the default — omit the directive)." | All 19 rules write `// lintcn:severity` explicitly, and `plop-templates/rule.go.hbs` always emits it. The default is real (`discover.js` falls back to `error`), but the convention is to state it. Follow the rules, not the sentence. |
 | SKILL.md § Package Name: "The package name must match the folder name." | Not enforced anywhere. `codegen.ts` imports each folder under an explicit alias, which is why the two `-test` rules can use trimmed package names. Match it as a convention; do not treat a mismatch as a build error. |
 | SKILL.md § Package Name: "The exported variable name must match the pattern `var XxxRule`." | `RULE_VAR_RE` accepts `var <anything> = <anything>.Rule{`. What is actually forced is that the variable be **exported** (`wrapper/main.go` references it) and that the type name end in `Rule`. |
 | SKILL.md § Rule Options: rules "accept configuration via JSON". | Not through lintcn. `runner.go:292` passes `nil` for every rule on every file. Options are a test-only surface today; defaults are the shipped behaviour. |
@@ -306,10 +302,11 @@ no file filter outside the rule itself.
   practice: a discovery-level break shows up as a rule that silently stops running.
 - **No CI.** There is no `.github/` in this repository. Every `TEST`, `VET`, `GOFMT` and `MUTATION`
   tag names a command someone has to run, not a gate that blocks a merge.
-- **Section L is unmeasured.** The tsgolint linter does have per-rule timing (`RuleTimingStore` in
-  `linter.go`), but `runner.go` never sets it, so `npx lintcn lint` exposes no timing flag and no
-  rule here has been profiled. L1–L5 are reasoned from the traversal code and from the shape of the
-  existing rules; treat them as design practice, not as findings.
+- **There are no performance propositions, deliberately.** The linter has per-rule timing
+  (`RuleTimingStore` in `linter.go`), but `runner.go` never sets it, so `npx lintcn lint` exposes
+  no timing flag and no rule here has ever been profiled. Items asserting a cost model — guard
+  before checker call, narrowest node kind, allocation in `Run` — were dropped rather than shipped
+  as reasoning dressed up as findings. Add them when there is a measurement.
 - **The mutation numbers are historical.** PORT.md records 100% test efficacy per rule package and
   for `archkit` at the time of the port. That was not re-run for this checklist.
 - **`archkit`'s ten recorded cross-package survivors were not re-verified.** The comment in

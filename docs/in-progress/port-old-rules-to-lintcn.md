@@ -31,8 +31,9 @@ synced from `remorses/lintcn` and must not be edited locally.
    NOT COVERED noise. Ten such mutants in `types.go` are covered only by
    rule-package tests gremlins cannot see cross-package; the file documents
    them.
-6. **Severity:** architectural invariants are `error` (the default — omit
-   the directive). Advisory rules are `warn`, which in lintcn reports on
+6. **Severity:** `// lintcn:severity` is always written explicitly, even
+   though `error` is the parsed default. Architectural invariants are
+   `error`. Advisory rules are `warn`, which in lintcn reports on
    changed and untracked files only and never fails CI — the right shape for
    agent-facing guidance on new code. Currently `warn`:
    `no-page-request-in-journey`, `no-double-library-in-domain-test`,
