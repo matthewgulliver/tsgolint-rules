@@ -64,7 +64,7 @@ func TestPublishedContractPublishesNoMutableValue(t *testing.T) {
 		// The gate: outside the public tree (default file name `file.ts`) the
 		// rule reports nothing, however mutable the published value is.
 		{
-			Code:     `export const CODES: Array<string> = ["gbp"]`,
+			Code: `export const CODES: Array<string> = ["gbp"]`,
 		},
 	}, []rule_tester.InvalidTestCase{
 		// The blind spot, the other way round: same syntax as the frozen one.

@@ -42,8 +42,8 @@ func TestNoConstructedCollaborators(t *testing.T) {
 		// The gate: outside the inside trees (default file name `file.ts`) the
 		// rule reports nothing, however provider-shaped the construction is.
 		{
-			Code:     `import { Pool } from "pg"; const pool = new Pool()`,
-			Files:    pg,
+			Code:  `import { Pool } from "pg"; const pool = new Pool()`,
+			Files: pg,
 		},
 	}, []rule_tester.InvalidTestCase{
 		// A dependency constructed where it should have been injected.

@@ -22,7 +22,7 @@ func TestPortBehaviourIsAnInterface(t *testing.T) {
 		// The gate: outside the ports tree (default file name `file.ts`) the
 		// rule reports nothing, however behaviour-shaped the alias is.
 		{
-			Code:     `export type ForPledgingToOccasions = (command: string) => Promise<string>`,
+			Code: `export type ForPledgingToOccasions = (command: string) => Promise<string>`,
 		},
 		// A data shape, which is what `type` is reserved for here.
 		{Code: `export type StoredOccasion = { readonly value: string; readonly version: number }`, FileName: inPorts},
