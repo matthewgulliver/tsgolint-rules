@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true
+  },
+  "include": ["old/**/*.ts", "fixtures/**/*.ts"],
+  "exclude": ["node_modules", ".lintcn"]
+}

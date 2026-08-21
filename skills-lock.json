@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "lintcn": {
+      "source": "remorses/lintcn",
+      "sourceType": "github",
+      "skillPath": "skills/lintcn/SKILL.md",
+      "computedHash": "0f61a8b3baab7ed44d5367106bdbee9f49c4168de2e03ac9c969c49d4e5ceccc"
+    }
+  }
+}
