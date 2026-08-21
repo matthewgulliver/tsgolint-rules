@@ -1,0 +1,36 @@
+
+[TestPublishedContractPublishesNoMutableValue/invalid-0 - 1]
+Diagnostic 1: mutableContainerInContract (3:22 - 3:29)
+Message: `REGISTRY` is published as a standard-library container exposing `clear`, so a consumer can write into state every other context reads.
+Help: Publish the readonly view of the container — `ReadonlyMap`, `ReadonlySet`, `ReadonlyArray` — or a function that answers a question instead of handing the collection over.
+   2 |         const buildRegistry = (): Map<string, string> => new Map()
+   3 |         export const REGISTRY = buildRegistry()
+     |                      ~~~~~~~~
+   4 |       
+---
+
+[TestPublishedContractPublishesNoMutableValue/invalid-1 - 1]
+Diagnostic 1: mutableMemberInContract (4:22 - 4:27)
+Message: `LIMITS` is published with a writable `maxOpenPledges`, so any context holding the contract can change what every other context reads.
+Help: Publish a value whose members are `readonly` — freezing it, or declaring the contract type with `readonly` on every member — and communicate change as an event.
+   3 |         const build = (): Limits => ({ maxOpenPledges: 5 })
+   4 |         export const LIMITS = build()
+     |                      ~~~~~~
+   5 |       
+---
+
+[TestPublishedContractPublishesNoMutableValue/invalid-2 - 1]
+Diagnostic 1: mutableContainerInContract (1:14 - 1:18)
+Message: `CODES` is published as a standard-library container exposing `pop`, so a consumer can write into state every other context reads.
+Help: Publish the readonly view of the container — `ReadonlyMap`, `ReadonlySet`, `ReadonlyArray` — or a function that answers a question instead of handing the collection over.
+   1 | export const CODES: Array<string> = ["gbp"]
+     |              ~~~~~
+---
+
+[TestPublishedContractPublishesNoMutableValue/invalid-3 - 1]
+Diagnostic 1: mutableContainerInContract (1:14 - 1:17)
+Message: `SEEN` is published as a standard-library container exposing `add`, so a consumer can write into state every other context reads.
+Help: Publish the readonly view of the container — `ReadonlyMap`, `ReadonlySet`, `ReadonlyArray` — or a function that answers a question instead of handing the collection over.
+   1 | export const SEEN: Set<string> = new Set()
+     |              ~~~~
+---
