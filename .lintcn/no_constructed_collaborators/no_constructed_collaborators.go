@@ -5,6 +5,8 @@
 package no_constructed_collaborators
 
 import (
+	"slices"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/lintcn-rules/archkit"
@@ -41,12 +43,10 @@ var NoConstructedCollaboratorsRule = rule.Rule{
 
 				constructedType := ctx.TypeChecker.GetTypeAtLocation(constructed)
 
-				for _, file := range archkit.DeclaringFiles(constructedType) {
-					if archkit.IsPackageDependency(file) {
-						ctx.ReportNode(node, buildProviderConstructionMessage(
-							name, "a package dependency"))
-						return
-					}
+				if slices.ContainsFunc(archkit.DeclaringFiles(constructedType), archkit.IsPackageDependency) {
+					ctx.ReportNode(node, buildProviderConstructionMessage(
+						name, "a package dependency"))
+					return
 				}
 			},
 		}

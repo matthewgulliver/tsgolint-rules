@@ -5,6 +5,8 @@
 package no_double_library_in_domain
 
 import (
+	"slices"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -51,12 +53,7 @@ func buildDoubleLibraryMessage(method string) rule.RuleMessage {
 }
 
 func contains(values []string, wanted string) bool {
-	for _, value := range values {
-		if value == wanted {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(values, wanted)
 }
 
 var NoDoubleLibraryInDomainTestRule = rule.Rule{

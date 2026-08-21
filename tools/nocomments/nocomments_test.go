@@ -7,5 +7,6 @@ import (
 )
 
 func TestReportsEveryCommentButDirectives(t *testing.T) {
+	t.Parallel()
 	analysistest.Run(t, analysistest.TestData(), Analyzer, "a")
 }

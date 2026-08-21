@@ -3,6 +3,7 @@ package archkit
 import (
 	"path"
 	"regexp"
+	"slices"
 	"strings"
 )
 
@@ -57,12 +58,7 @@ func IsOutsideDependency(fileName string) bool {
 }
 
 func IsPackageDependency(fileName string) bool {
-	for _, segment := range split(fileName) {
-		if segment == "node_modules" {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(split(fileName), "node_modules")
 }
 
 func IsStandardLibrary(fileName string) bool {

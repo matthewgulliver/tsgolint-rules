@@ -56,7 +56,9 @@ var indexes sync.Map
 
 func indexOf(program *compiler.Program, judged []string) *index {
 	if cached, ok := indexes.Load(program); ok {
-		return cached.(*index)
+		if idx, ok := cached.(*index); ok {
+			return idx
+		}
 	}
 	built := &index{byName: make(map[string][]string, 256)}
 	for _, sourceFile := range program.SourceFiles() {
@@ -69,7 +71,10 @@ func indexOf(program *compiler.Program, judged []string) *index {
 		}
 	}
 	actual, _ := indexes.LoadOrStore(program, built)
-	return actual.(*index)
+	if idx, ok := actual.(*index); ok {
+		return idx
+	}
+	return built
 }
 
 func exportedTypeNames(sourceFile *ast.SourceFile) []string {

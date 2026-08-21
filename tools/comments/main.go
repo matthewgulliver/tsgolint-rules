@@ -15,6 +15,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"sort"
 	"strings"
 )
@@ -98,8 +99,7 @@ func main() {
 // it when the comment is all that line holds.
 func strip(src []byte, groups []group) []byte {
 	out := src
-	for i := len(groups) - 1; i >= 0; i-- {
-		g := groups[i]
+	for _, g := range slices.Backward(groups) {
 		if g.kept {
 			continue
 		}
@@ -171,13 +171,19 @@ func report(files []file, root, out string) {
 				kind += " _(kept in source)_"
 			}
 			fmt.Fprintf(&b, "**L%d**%s\n", g.line, kind)
-			for _, line := range strings.Split(strings.TrimRight(g.text, "\n"), "\n") {
+			for line := range strings.SplitSeq(strings.TrimRight(g.text, "\n"), "\n") {
 				fmt.Fprintf(&b, "> %s\n", line)
 			}
 			b.WriteString("\n")
 		}
 	}
 
+	// Writing a report that removed nothing would overwrite the archive of what
+	// earlier runs removed, which is the only copy.
+	if removed == 0 {
+		fmt.Printf("no comments to remove; %s left untouched\n", out)
+		return
+	}
 	if err := os.WriteFile(out, []byte(b.String()), 0o644); err != nil {
 		panic(err)
 	}

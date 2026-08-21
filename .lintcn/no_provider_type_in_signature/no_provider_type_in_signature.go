@@ -6,6 +6,7 @@ package no_provider_type_in_signature
 
 import (
 	"regexp"
+	"slices"
 
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
@@ -161,16 +162,12 @@ var NoProviderTypeInSignatureRule = rule.Rule{
 				symbol = checker.SkipAlias(symbol, ctx.TypeChecker)
 
 				if matchesAny(transports, written.Text()) {
-					for _, declaration := range symbol.Declarations {
-						if notOurs(declaration) {
-							return finding{name: symbol.Name, transport: true}, true
-						}
+					if slices.ContainsFunc(symbol.Declarations, notOurs) {
+						return finding{name: symbol.Name, transport: true}, true
 					}
 				}
-				for _, declaration := range symbol.Declarations {
-					if reportable(declaration) {
-						return finding{name: symbol.Name}, true
-					}
+				if slices.ContainsFunc(symbol.Declarations, reportable) {
+					return finding{name: symbol.Name}, true
 				}
 			}
 			return finding{}, false
