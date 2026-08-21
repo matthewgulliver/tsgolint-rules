@@ -6,11 +6,10 @@
   (`go build`, `go test`, `npx lintcn lint` all work). Root `tsconfig.json`
   added (scopes lint to `old/**/*.ts`).
 - Seed rule `no_floating_promises` added for verification, then removed.
-- Phase 2 in progress. Ported and committed: `no_page_request_in_journey`,
-  `use_case_throws_a_domain_error`, `stored_state_switch_has_a_throwing_default`,
-  `use_case_result_is_discriminated`, `domain_function_returns_an_answer`,
-  `domain_probe_returns_void`. Remaining work is owned by two parallel porter
-  agents (`.opencode/agents/porter-hexagon.md`, `.opencode/agents/porter-tests.md`).
+- Phase 2 DONE: all 19 rules ported, one per commit, each green with
+  gremlins 100% test efficacy. `archkit` carries the shared helpers
+  (`Gated`, scope, types) and has 10 recorded cross-package NOT COVERED
+  mutants. Remaining work is Phase 3 only.
 
 ## Findings driving the design
 
@@ -73,7 +72,7 @@ grows per decision 5), gate.go (`Gated` replaces `archrule.Rule{Files}`).
 Mutation: archkit 100% efficacy (2 recorded cross-package survivors), rule
 package 100%/100%.
 
-## Phase 2 — Port rules in dependency-risk order (TDD per rule)
+## Phase 2 — Port rules in dependency-risk order (TDD per rule) — DONE
 
 ### Porting is parallelized across two subgroups (commits stay serial)
 
