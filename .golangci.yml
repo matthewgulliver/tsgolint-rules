@@ -25,10 +25,6 @@ linters:
     - thelper
   settings:
     revive:
-      # revive's default set minus `exported` and `package-comments` (both
-      # demand the comments tools/nocomments exists to forbid) and
-      # `package-naming` (a rule package's name tracks the snake_case directory
-      # lintcn discovers it by).
       rules:
         - name: blank-imports
         - name: context-as-argument
@@ -53,8 +49,6 @@ linters:
         - name: var-naming
   exclusions:
     rules:
-      # isDirective is copied verbatim from go/ast so it can be re-diffed when
-      # Go changes it; a De Morgan rewrite would make that diff meaningless.
       - path: tools/nocomments/nocomments.go
         text: 'QF1001'
 

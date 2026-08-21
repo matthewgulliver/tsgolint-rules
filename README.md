@@ -60,14 +60,10 @@ Aborting a `lintcn lint` or `build` leaves a lock directory under
 `~/.cache/lintcn/locks/build/<hash>` that blocks every later run. Remove it,
 or `npx lintcn clean`.
 
-The rule sources carry no comments. `npm run lint:comments` fails on any that
-is not a `// lintcn:` directive — no Go linter can do this, so `tools/nocomments`
-is a `go vet` analyzer; `-fix` removes them. What the sources used to say is in
-`docs/rule-comments.md`; `npm run comments` moves any new ones there, and does
-nothing when there are none.
+The Go sources carry no comments. `npm run lint:comments` fails on any that is
+not a `// lintcn:` directive; no Go linter can do this, so `tools/nocomments`
+is a `go vet` analyzer and `-fix` removes them.
 
-A freshly generated rule fails this check: the templates' `TODO` scaffolding is
-there to be deleted, so a clean `lint:comments` is part of the rule being done.
-
-`CHECKLIST.md` holds the conventions a new rule must follow, with what
-enforces each. `docs/rules/` documents what each rule judges and why.
+`docs/rules/` documents what each rule judges and why.
+`.agents/skills/lintcn/CHECKLIST.md` holds the conventions a new rule must
+follow, with what enforces each.

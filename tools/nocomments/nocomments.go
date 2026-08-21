@@ -32,9 +32,6 @@ func run(pass *analysis.Pass) (any, error) {
 		if ast.IsGenerated(file) {
 			continue
 		}
-		// file.Comments is the only complete list: go/ast.Walk has an explicit
-		// `case *File` that skips it, so ast.Inspect never visits a free-floating
-		// or trailing comment.
 		src, _ := pass.ReadFile(pass.Fset.Position(file.Pos()).Filename)
 		for _, group := range file.Comments {
 			for _, c := range group.List {
@@ -45,7 +42,7 @@ func run(pass *analysis.Pass) (any, error) {
 				pass.Report(analysis.Diagnostic{
 					Pos:     c.Pos(),
 					End:     c.End(),
-					Message: "comment is not permitted; record it in docs/rule-comments.md",
+					Message: "comment is not permitted",
 					SuggestedFixes: []analysis.SuggestedFix{{
 						Message:   "remove comment",
 						TextEdits: []analysis.TextEdit{{Pos: start, End: end}},
@@ -57,8 +54,6 @@ func run(pass *analysis.Pass) (any, error) {
 	return nil, nil
 }
 
-// wholeLine widens the deletion to the whole line when the comment is the only
-// thing on it, so -fix does not leave a blank line where the comment was.
 func wholeLine(fset *token.FileSet, src []byte, c *ast.Comment) (token.Pos, token.Pos) {
 	pos, endPos := fset.Position(c.Pos()), fset.Position(c.End())
 	f := fset.File(c.Pos())
@@ -74,8 +69,6 @@ func wholeLine(fset *token.FileSet, src []byte, c *ast.Comment) (token.Pos, toke
 	return f.LineStart(pos.Line), f.LineStart(endPos.Line + 1)
 }
 
-// Copied from go/ast, which exports IsGenerated but not isDirective. Without it
-// //go:build, //go:generate and //nolint would all be reported.
 func isDirective(c *ast.Comment) bool {
 	if !strings.HasPrefix(c.Text, "//") {
 		return false

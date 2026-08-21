@@ -242,7 +242,7 @@ Sources: `.lintcn/.tsgolint/internal/rule_tester/snapshot.go`.
 | J1 | `go build ./...` succeeds from `.lintcn/`. | every change | COMPILE |
 | J2 | `golangci-lint run ./...` is clean. | every change | `npm run lint:go` — v2 `standard` (errcheck, govet, ineffassign, staticcheck, unused) plus correctness, dead-code and consistency linters; see `.golangci.yml`. `--fix` handles most. Note `unused` cannot see an unused *exported* symbol, so J5 still rests on mutation testing. |
 | J3 | `gofmt -l .` reports nothing. | every file | GOFMT (verified clean; no hook or CI enforces it, and `plopfile.js` runs `gofmt -w` only on generated files) |
-| J4 | The rule carries no explanation in the source. What a rule judges and why lives in `docs/rules/`; the comments the sources once held are in `docs/rule-comments.md`. | every rule | CONV |
+| J4 | The rule carries no explanation in the source. What a rule judges and why lives in `docs/rules/`. | every rule | CONV |
 | J5 | Every exported symbol in `archkit` is consumed by at least one rule. | `archkit` | MUTATION (see E9) |
 | J6 | No comment appears in the source except `// lintcn:` metadata and Go compiler directives (`//go:`, `//nolint`). | every file | `npm run lint:comments` — the `tools/nocomments` analyzer; exit 3 standalone, 1 under `go vet -vettool`. `-fix` removes them. No `//nolint` escape hatch, since it runs standalone rather than through golangci-lint. |
 | J7 | No rule imports another rule package. | every rule | CONV (shared logic goes to `archkit`; the packages are siblings with no dependency order) |

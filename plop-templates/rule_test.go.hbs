@@ -8,8 +8,6 @@ import (
 )
 {{#if isGated}}
 
-// A file inside the tree this rule judges. Every case that should report needs
-// one, because the default test file name does not match defaultFiles.
 const inScope = "TODO/path/inside/the/gated/tree.ts"
 {{/if}}
 
@@ -17,16 +15,10 @@ func Test{{testName}}(t *testing.T) {
 	t.Parallel()
 	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &{{ruleVar}}, []rule_tester.ValidTestCase{
 {{#if isGated}}
-		// The gate: outside the tree the rule reports nothing, however
-		// violating the code is. Omitting FileName uses the default `file.ts`,
-		// which defaultFiles does not match.
 		{
 			Code: `TODO: the invalid code below, unchanged`,
 		},
 {{/if}}
-		// TODO: the near-misses. A valid case that could never report proves
-		// nothing; the ones worth writing are those a careless implementation
-		// would flag.
 		{
 			Code: `TODO`,
 {{#if isGated}}
@@ -35,7 +27,6 @@ func Test{{testName}}(t *testing.T) {
 		},
 	}, []rule_tester.InvalidTestCase{
 		{
-			// TODO: name what this case proves, not what it contains.
 			Code: `TODO`,
 {{#if isGated}}
 			FileName: inScope,
@@ -45,7 +36,6 @@ func Test{{testName}}(t *testing.T) {
 			},
 		},
 {{#if hasOptions}}
-		// The option changes what reports, so it needs its own case.
 		{
 			Code: `TODO`,
 {{#if isGated}}
