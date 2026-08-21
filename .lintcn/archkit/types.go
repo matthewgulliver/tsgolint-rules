@@ -179,6 +179,24 @@ func declaredName(name *ast.Node) *ast.Node {
 	return name
 }
 
+// WrittenName is the rightmost name a written reference carries — how `new
+// z.ZodError([])` and `new ZodError([])` are reported by the same name.
+func WrittenName(reference *ast.Node) string {
+	if reference == nil {
+		return ""
+	}
+	switch reference.Kind {
+	case ast.KindIdentifier:
+		return reference.Text()
+	case ast.KindQualifiedName:
+		return WrittenName(reference.AsQualifiedName().Right)
+	case ast.KindPropertyAccessExpression:
+		return WrittenName(reference.AsPropertyAccessExpression().Name())
+	default:
+		return ""
+	}
+}
+
 // ReturnType returns a signature's return type.
 func ReturnType(c *checker.Checker, signature *checker.Signature) *checker.Type {
 	if signature == nil {

@@ -1,0 +1,28 @@
+
+[TestNoConstructedCollaborators/invalid-0 - 1]
+Diagnostic 1: providerConstruction (1:41 - 1:50)
+Message: `new Pool` constructs a type declared by a package dependency, so this file chooses its own collaborator and no test can substitute another.
+Help: Take the capability as a port parameter and let the composition root construct the provider.
+   1 | import { Pool } from "pg"; const pool = new Pool()
+     |                                         ~~~~~~~~~~
+---
+
+[TestNoConstructedCollaborators/invalid-1 - 1]
+Diagnostic 1: providerConstruction (4:22 - 4:37)
+Message: `new Connection` constructs a type declared by a package dependency, so this file chooses its own collaborator and no test can substitute another.
+Help: Take the capability as a port parameter and let the composition root construct the provider.
+   3 |         const Connection = Pool
+   4 |         const pool = new Connection()
+     |                      ~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestNoConstructedCollaborators/invalid-2 - 1]
+Diagnostic 1: providerConstruction (3:24 - 3:41)
+Message: `new ZodError` constructs a type declared by a package dependency, so this file chooses its own collaborator and no test can substitute another.
+Help: Take the capability as a port parameter and let the composition root construct the provider.
+   2 |         import { z } from "zod"
+   3 |         const thrown = new z.ZodError([])
+     |                        ~~~~~~~~~~~~~~~~~~
+   4 |       
+---
