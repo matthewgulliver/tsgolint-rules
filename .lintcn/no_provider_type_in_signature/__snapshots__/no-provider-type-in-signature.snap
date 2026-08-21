@@ -1,0 +1,170 @@
+
+[TestNoProviderTypeInSignature/invalid-0 - 1]
+Diagnostic 1: providerParameterType (3:32 - 3:47)
+Message: Parameter `context` is declared as `Context`, a class or interface owned by a package dependency, so the inside of the hexagon can only be called by code holding that vendor's object.
+Help: Declare the parameter as a port or a domain type this repository owns, and let the adapter translate the vendor's object into it.
+   2 |         import type { Context } from "hono"
+   3 |         export const pledge = (context: Context) => context.req.url
+     |                                ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-1 - 1]
+Diagnostic 1: providerParameterType (4:39 - 4:69)
+Message: Parameter `connection` is declared as `Pool`, a class or interface owned by a package dependency, so the inside of the hexagon can only be called by code holding that vendor's object.
+Help: Declare the parameter as a port or a domain type this repository owns, and let the adapter translate the vendor's object into it.
+   3 |         export interface ForPledgingToOccasions {
+   4 |           readonly pledgeToOccasion: (connection: ReadonlyArray<Pool>) => Promise<void>
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoProviderTypeInSignature/invalid-2 - 1]
+Diagnostic 1: unbrandedPrincipal (2:32 - 2:48)
+Message: Parameter `principal` carries identity but its type has no brand, so anything holding the ids can assemble one and the inside cannot tell an authenticated caller from an invented one.
+Help: Type it as the principal branded with a non-exported `unique symbol`, and mint it only in the module that authenticates.
+   1 | 
+   2 |         export const pledge = (principal: string) => principal
+     |                                ~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-3 - 1]
+Diagnostic 1: unbrandedPrincipal (3:32 - 3:44)
+Message: Parameter `actor` carries identity but its type has no brand, so anything holding the ids can assemble one and the inside cannot tell an authenticated caller from an invented one.
+Help: Type it as the principal branded with a non-exported `unique symbol`, and mint it only in the module that authenticates.
+   2 |         type Caller = { readonly userId: string; readonly tenantId: string }
+   3 |         export const pledge = (actor: Caller) => actor.userId
+     |                                ~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-4 - 1]
+Diagnostic 1: unbrandedPrincipal (2:32 - 2:45)
+Message: Parameter `caller` carries identity but its type has no brand, so anything holding the ids can assemble one and the inside cannot tell an authenticated caller from an invented one.
+Help: Type it as the principal branded with a non-exported `unique symbol`, and mint it only in the module that authenticates.
+   1 | 
+   2 |         export const pledge = (caller: string) => caller
+     |                                ~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-5 - 1]
+Diagnostic 1: providerReturnType (5:32 - 5:56)
+Message: The return type of `rowsFor` is declared as `QueryResult`, a class or interface owned by a package dependency, so every consumer of the inside now holds the vendor's object and follows the vendor when it changes.
+Help: Return a domain type or port result this repository owns, and translate at the adapter.
+   4 |         export interface OccasionReads {
+   5 |           rowsFor(id: string): Promise<QueryResult<Row>>
+     |                                ~~~~~~~~~~~~~~~~~~~~~~~~~
+   6 |         }
+---
+
+[TestNoProviderTypeInSignature/invalid-6 - 1]
+Diagnostic 1: providerReturnType (3:41 - 3:59)
+Message: Member `pool` is declared as `Pool`, a class or interface owned by a package dependency, so every consumer of the inside now holds the vendor's object and follows the vendor when it changes.
+Help: Return a domain type or port result this repository owns, and translate at the adapter.
+   2 |         import type { Pool } from "pg"
+   3 |         export interface PledgingDeps { readonly pool: Pool }
+     |                                         ~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-7 - 1]
+Diagnostic 1: providerReturnType (3:36 - 3:45)
+Message: The return type is declared as `Pool`, a class or interface owned by a package dependency, so every consumer of the inside now holds the vendor's object and follows the vendor when it changes.
+Help: Return a domain type or port result this repository owns, and translate at the adapter.
+   2 |         import type { Pool as Connection } from "pg"
+   3 |         export const connect = (): Connection => ({} as Connection)
+     |                                    ~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-8 - 1]
+Diagnostic 1: providerReturnType (4:45 - 4:80)
+Message: The return type is declared as `QueryResult`, a class or interface owned by a package dependency, so every consumer of the inside now holds the vendor's object and follows the vendor when it changes.
+Help: Return a domain type or port result this repository owns, and translate at the adapter.
+   3 |         export interface OccasionReads {
+   4 |           readonly rowsFor: (id: string) => Promise<QueryResult<{ id: string }>>
+     |                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoProviderTypeInSignature/invalid-9 - 1]
+Diagnostic 1: transportTypeInSignature (3:32 - 3:47)
+Message: Parameter `request` is declared as `Request`, the platform's transport type, so the inside of the hexagon now depends on one transport and cannot be driven by a queue, a CLI or a test without it.
+Help: Take a typed application command and return a domain result, and let the driving adapter read the request.
+   2 |         import type { Request } from "undici-types"
+   3 |         export const pledge = (request: Request) => request.url
+     |                                ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-10 - 1]
+Diagnostic 1: transportTypeInSignature (4:31 - 4:46)
+Message: The return type of `pledge` is declared as `Headers`, the platform's transport type, so the inside of the hexagon now depends on one transport and cannot be driven by a queue, a CLI or a test without it.
+Help: Take a typed application command and return a domain result, and let the driving adapter read the request.
+   3 |         export interface ForPledgingToOccasions {
+   4 |           pledge(id: string): Promise<Headers>
+     |                               ~~~~~~~~~~~~~~~~
+   5 |         }
+---
+
+[TestNoProviderTypeInSignature/invalid-11 - 1]
+Diagnostic 1: transportTypeInSignature (3:32 - 3:47)
+Message: Parameter `request` is declared as `Request`, the platform's transport type, so the inside of the hexagon now depends on one transport and cannot be driven by a queue, a CLI or a test without it.
+Help: Take a typed application command and return a domain result, and let the driving adapter read the request.
+   2 |         /// <reference lib="dom" />
+   3 |         export const pledge = (request: Request) => request.url
+     |                                ~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-12 - 1]
+Diagnostic 1: transportTypeInSignature (3:33 - 3:57)
+Message: Member `context` is declared as `Context`, the platform's transport type, so the inside of the hexagon now depends on one transport and cannot be driven by a queue, a CLI or a test without it.
+Help: Take a typed application command and return a domain result, and let the driving adapter read the request.
+   2 |         import type { Context } from "hono"
+   3 |         export interface Deps { readonly context: Context }
+     |                                 ~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-13 - 1]
+Diagnostic 1: transportTypeInSignature (3:35 - 3:42)
+Message: The return type is declared as `Request`, the platform's transport type, so the inside of the hexagon now depends on one transport and cannot be driven by a queue, a CLI or a test without it.
+Help: Take a typed application command and return a domain result, and let the driving adapter read the request.
+   2 |         import type { Request as Incoming } from "undici-types"
+   3 |         export const pledge = (): Incoming => ({} as Incoming)
+     |                                   ~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-14 - 1]
+Diagnostic 1: providerParameterType (3:32 - 3:45)
+Message: A destructured parameter is declared as `Pool`, a class or interface owned by a package dependency, so the inside of the hexagon can only be called by code holding that vendor's object.
+Help: Declare the parameter as a port or a domain type this repository owns, and let the adapter translate the vendor's object into it.
+   2 |         import type { Pool } from "pg"
+   3 |         export const pledge = ({ pool }: Pool) => pool
+     |                                ~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-15 - 1]
+Diagnostic 1: providerParameterType (3:30 - 3:51)
+Message: Parameter `client` is declared as `Client`, a class or interface owned by a package dependency, so the inside of the hexagon can only be called by code holding that vendor's object.
+Help: Declare the parameter as a port or a domain type this repository owns, and let the adapter translate the vendor's object into it.
+   2 |         import type { storage } from "aws-sdk"
+   3 |         export const send = (client: storage.Client) => client.send("put")
+     |                              ~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestNoProviderTypeInSignature/invalid-16 - 1]
+Diagnostic 1: providerParameterType (3:31 - 3:58)
+Message: Parameter `handle` is declared as `Handle`, a class or interface owned by a package dependency, so the inside of the hexagon can only be called by code holding that vendor's object.
+Help: Declare the parameter as a port or a domain type this repository owns, and let the adapter translate the vendor's object into it.
+   2 |         import type { storage } from "aws-sdk"
+   3 |         export const keyOf = (handle: storage.inner.Handle) => handle.key
+     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
