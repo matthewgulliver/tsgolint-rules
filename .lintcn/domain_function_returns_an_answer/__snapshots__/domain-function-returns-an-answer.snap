@@ -1,0 +1,37 @@
+
+[TestDomainFunctionReturnsAnAnswer/invalid-0 - 1]
+Diagnostic 1: answerlessDomainFunction (4:14 - 4:19)
+Message: `settle` returns nothing, so its caller learns neither the next state nor why the transition was refused, and the effect it must have had lives somewhere the model cannot show.
+Help: Return the new aggregate or an explicit business refusal; leave the effect to the caller.
+   3 |   declare const audit: (o: Occasion) => void
+   4 | export const settle = (o: Occasion) => { audit(o) }
+     |              ~~~~~~
+---
+
+[TestDomainFunctionReturnsAnAnswer/invalid-1 - 1]
+Diagnostic 1: answerlessDomainFunction (5:25 - 5:30)
+Message: `record` returns nothing, so its caller learns neither the next state nor why the transition was refused, and the effect it must have had lives somewhere the model cannot show.
+Help: Return the new aggregate or an explicit business refusal; leave the effect to the caller.
+   4 | 
+   5 |         export function record(o: { total: number }) {
+     |                         ~~~~~~
+   6 |           o.total += 1
+---
+
+[TestDomainFunctionReturnsAnAnswer/invalid-2 - 1]
+Diagnostic 1: answerlessDomainFunction (4:14 - 4:19)
+Message: `settle` returns nothing, so its caller learns neither the next state nor why the transition was refused, and the effect it must have had lives somewhere the model cannot show.
+Help: Return the new aggregate or an explicit business refusal; leave the effect to the caller.
+   3 |   declare const audit: (o: Occasion) => void
+   4 | export const settle = (o: Occasion) => { if (o.settled) return undefined; return }
+     |              ~~~~~~
+---
+
+[TestDomainFunctionReturnsAnAnswer/invalid-3 - 1]
+Diagnostic 1: answerlessDomainFunction (4:14 - 4:23)
+Message: `settleWith` returns nothing, so its caller learns neither the next state nor why the transition was refused, and the effect it must have had lives somewhere the model cannot show.
+Help: Return the new aggregate or an explicit business refusal; leave the effect to the caller.
+   3 |   declare const audit: (o: Occasion) => void
+   4 | export const settleWith = (reason: string) => (o: Occasion) => { audit(o) }
+     |              ~~~~~~~~~~
+---

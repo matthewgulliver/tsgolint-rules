@@ -119,6 +119,11 @@ type Member struct {
 	Type *checker.Type
 }
 
+// IsVoidLike reports whether a type carries no answer — the shape of a write.
+func IsVoidLike(t *checker.Type) bool {
+	return utils.IsTypeFlagSet(t, checker.TypeFlagsVoid|checker.TypeFlagsUndefined)
+}
+
 // ReturnType returns a signature's return type.
 func ReturnType(c *checker.Checker, signature *checker.Signature) *checker.Type {
 	if signature == nil {
