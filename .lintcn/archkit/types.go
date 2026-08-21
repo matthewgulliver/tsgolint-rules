@@ -28,8 +28,9 @@ func DeclaringFiles(t *checker.Type) []string {
 	// type has no symbol; a synthesized declaration has no source file), and
 	// so are the checker-dependent arms of the helpers below (a non-array
 	// type, an unawaited one). Gremlins cannot see that coverage
-	// cross-package, so the three surviving NOT COVERED mutants in this file
-	// are recorded as covered there.
+	// cross-package, so the five surviving NOT COVERED mutants in this file
+	// are recorded as covered there; DeclaredType's two nil arms are
+	// defensive and documented at the function.
 	if symbol == nil {
 		return nil
 	}
@@ -122,6 +123,21 @@ type Member struct {
 // IsVoidLike reports whether a type carries no answer — the shape of a write.
 func IsVoidLike(t *checker.Type) bool {
 	return utils.IsTypeFlagSet(t, checker.TypeFlagsVoid|checker.TypeFlagsUndefined)
+}
+
+// DeclaredType resolves an interface or type-alias declaration to the type it
+// declares. The nil arms are defensive: the consumers call it on
+// interface/type-alias declarations whose names always resolve.
+func DeclaredType(c *checker.Checker, declaration *ast.Node) *checker.Type {
+	name := declaration.Name()
+	if name == nil {
+		return nil
+	}
+	symbol := c.GetSymbolAtLocation(name)
+	if symbol == nil {
+		return nil
+	}
+	return checker.Checker_getDeclaredTypeOfSymbol(c, symbol)
 }
 
 // ReturnType returns a signature's return type.

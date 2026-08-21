@@ -1,0 +1,44 @@
+
+[TestDomainProbeReturnsVoid/invalid-0 - 1]
+Diagnostic 1: probeMemberReturnsValue (2:9 - 4:9)
+Message: `PledgeInstrumentation.pledgeAccepted` returns an answer. A Domain Probe announces a fact fire-and-forget, so its method must return `void`.
+Help: Declare the method as returning `void`; a probe announces and does not wait, so an awaited acknowledgement is a different collaboration.
+   1 | 
+   2 |         export interface PledgeInstrumentation {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           readonly pledgeAccepted: (facts: PledgeFacts) => PledgeReceipt
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |         }
+     | ~~~~~~~~~
+   5 |       
+---
+
+[TestDomainProbeReturnsVoid/invalid-1 - 1]
+Diagnostic 1: probeMemberReturnsValue (3:9 - 5:9)
+Message: `PledgeProbe.pledgeAccepted` returns an answer. A Domain Probe announces a fact fire-and-forget, so its method must return `void`.
+Help: Declare the method as returning `void`; a probe announces and does not wait, so an awaited acknowledgement is a different collaboration.
+   2 |         type Acknowledged = Promise<void>
+   3 |         export interface PledgeProbe {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           readonly pledgeAccepted: (facts: PledgeFacts) => Acknowledged
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+     | ~~~~~~~~~
+   6 |       
+---
+
+[TestDomainProbeReturnsVoid/invalid-2 - 1]
+Diagnostic 1: probeMemberReturnsValue (2:9 - 5:9)
+Message: `PledgeInstrumentation.pledgeAccepted` returns an answer. A Domain Probe announces a fact fire-and-forget, so its method must return `void`.
+Help: Declare the method as returning `void`; a probe announces and does not wait, so an awaited acknowledgement is a different collaboration.
+   1 | 
+   2 |         export interface PledgeInstrumentation {
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |           readonly pledgeAccepted: (facts: PledgeFacts) => PledgeReceipt
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |           readonly pledgeRefused: (facts: PledgeFacts) => PledgeReceipt
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |         }
+     | ~~~~~~~~~
+   6 |       
+---
