@@ -21,7 +21,7 @@ var playwright = map[string]string{
 
 func TestNoPageRequestInJourney(t *testing.T) {
 	t.Parallel()
-	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoPageRequestInJourneyRule, []rule_tester.ValidTestCase{
+	rule_tester.RunRuleTester(fixtures.GetRootDir(), "tsconfig.minimal.json", t, &NoPageRequestInJourneyRule.Rule, []rule_tester.ValidTestCase{
 		// A journey driving the browser, which is the whole point of the file.
 		{
 			Code: `
@@ -40,16 +40,6 @@ func TestNoPageRequestInJourney(t *testing.T) {
         page.request.post("/api/occasions")
       `,
 			FileName: inE2E,
-		},
-		// The gate: outside the e2e tree (default file name `file.ts`) the
-		// rule reports nothing, however Playwright-typed the value is.
-		{
-			Code: `
-        import type { Page } from "@playwright/test"
-        declare const page: Page
-        page.request.post("/api/occasions")
-      `,
-			Files: playwright,
 		},
 	}, []rule_tester.InvalidTestCase{
 		// The doc's prohibition: a journey stepping around the browser.

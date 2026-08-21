@@ -1,10 +1,6 @@
-// Package archscope matches a file against the `.gitignore`-style globs that
-// `.oxlintrc.json` uses to scope a JS rule.
-//
-// `archlint` matches every rule's tree here once per file, before the rule
-// runs. A rule reaches for this package only for a second path vocabulary of
-// its own — the trees a domain signature may name, where a row type is
-// declared — never to decide whether it should be looking at this file.
+// File-path scoping: `.gitignore`-style glob matching and declaration-file
+// classification, ported from the old fork's `internal/archscope`.
+
 package archkit
 
 import (

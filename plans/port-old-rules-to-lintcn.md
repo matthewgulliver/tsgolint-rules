@@ -26,26 +26,47 @@
    `~/.cache/lintcn/locks/build/<hash>` that blocks all later runs. Remove the
    dir (or `npx lintcn clean`) when a run is aborted.
 
-## Phase 1 — Rebuild shared helpers as `.lintcn/archkit/` (TDD)
+## Decisions (from the template-port review)
 
-One Go package, subfiles by concern; table-driven unit tests before rules use them.
+1. **`old/` is a frozen reference until Phase 3.** Do not delete anything
+   under `old/` per-rule — `old/archlint` registers every rule, so piecemeal
+   deletion kills the old binary and the old-vs-new fixture comparison from
+   the first commit. Ported rules coexist with their old copies; Phase 3
+   deletes `old/` wholesale in one final commit. (Commit discipline note:
+   "delete the old rule in the same commit" is superseded by this.)
+2. **Severity `warn` for advisory rules is a deliberate reversal** of the old
+   fork's parseSeverity refusal ("a severity that reports without failing is
+   a gate nobody notices going out"). lintcn's warn semantics — changed/untracked
+   files only, never fails CI — is exactly right for agent-facing guidance on
+   new code, which is the audience here. Architectural invariants stay
+   `error` (default).
+3. **Snapshots are load-bearing regression tests**, not decoration: run all
+   rule tests with `TSGOLINT_SNAPSHOT_CWD=true`, which resolves
+   `__snapshots__` next to the rule package (`UPDATE_SNAPS=true` likewise).
+   Never hand-copy snapshots out of the tsgolint cache.
+4. **Docs URLs are dropped deliberately.** `archrule.DocumentedAt` +
+   `docs/rules/*.md` enforcement has no lintcn equivalent and `lintcn:source`
+   is provenance only. Message `Help` text carries the guidance.
+5. **archkit grows on demand.** Helpers port from `old/internal/archtypes`
+   only when the first rule needing them lands. Wholesale ports leave
+   unconsumed symbols (mutation NOT COVERED noise).
+6. **`Name:` must be an inline string literal**, not a const — lintcn's
+   discovery binds the CLI name by matching `Name: "..."` in source.
+7. **Gremlins runs on every rule package at its port commit** (sub-second,
+   `gremlins unleash ./<rule>/`), plus archkit.
+8. **Configurable scope:** rules with a user-overridable tree parse their
+   options first and pass the resolved pattern list to `archkit.Gated`
+   (signature already takes `files []string`); defaults stay `var defaultFiles`.
+9. Every gated rule's test table carries at least one **out-of-tree valid
+   case** proving the gate, and `archkit` has `TestGated`.
 
-### archtypes (type helpers over checker/utils) — ported signatures:
-`Constituents`, `TypeReferenceNames`, `Members`, `CallSignatures`,
-`ReturnType`, `IsCallable`, `DeclaringFiles`, `DeclaringFilesOfSymbol`,
-`DeclaredType`, `Unwrapped`, `IsVoidLike`, `DeclaredUnder`, `WrittenName`,
-`ElementTypes`
+## Phase 1 — Rebuild shared helpers as `.lintcn/archkit/` (TDD) — DONE
 
-### archscope (file/module scoping)
-`IsPackageDependency`, `IsStandardLibrary`, `Includes` (glob match),
-`ContextOf`, `Compile`
-
-### archrule replacement
-`Gate(files []string) func(ctx) bool` — glob check on
-`ctx.SourceFile.FileName()`; each gated rule early-returns in its listeners.
-
-Where implementations are non-obvious, derive behavior from the old rules'
-usage + their tests (the old `_test.go` files are the spec).
+Ported from `old/internal/` (exists in-tree): scope.go (glob matching,
+dependency/stdlib classification), types.go (trimmed to consumed symbols,
+grows per decision 5), gate.go (`Gated` replaces `archrule.Rule{Files}`).
+Mutation: archkit 100% efficacy (2 recorded cross-package survivors), rule
+package 100%/100%.
 
 ## Phase 2 — Port rules in dependency-risk order (TDD per rule)
 
@@ -54,11 +75,8 @@ usage + their tests (the old `_test.go` files are the spec).
 Every commit is a labelled example (see ~/repos/personal/commit-rules):
 
 - **One rule port per commit, and the commit is complete**: the new
-  `.lintcn/<rule>/` (rule + tests + snapshots), the helper code it needs, and
-  the **deletion of `old/rules/<rule>/` (and its fixture docs/tests that
-  exist only for it) in the same commit**. After each commit, no trace of the
-  old rule remains — the port is a move + adaptation, and the commit's diff
-  shows exactly what changed while moving.
+  `.lintcn/<rule>/` (rule + tests + snapshots) and any archkit helpers it
+  consumes. `old/` stays frozen (decision 1) — no per-rule deletions.
 - Commit message states the rule name in the subject (the message is the
   index) and, where the port was not a pure move, a short body on what
   changed and why (e.g. "archrule.Files gating replaced with in-Run glob
@@ -70,9 +88,10 @@ Every commit is a labelled example (see ~/repos/personal/commit-rules):
 
 Per rule (RED→GREEN): copy rule + test into `.lintcn/<snake>/` → run
 `go test -run TestX` (fails on missing helpers) → port/adapt logic → green →
-`UPDATE_SNAPS=true` → read snapshot to verify message quality → add
-`lintcn:name` / `lintcn:description` / `lintcn:severity` metadata → commit
-with the old rule deleted.
+`TSGOLINT_SNAPSHOT_CWD=true UPDATE_SNAPS=true` → read snapshot to verify
+message quality → add
+`lintcn:name` / `lintcn:description` / `lintcn:severity` metadata → out-of-tree
+gate case → `gremlins unleash ./<rule>/` → commit (old/ untouched).
 
 Order:
 1. **Checker-only rules** (no archscope): `stored_state_switch_has_a_throwing_default`,
@@ -97,14 +116,12 @@ Revisit per rule after seeing violation volume on `old/fixtures/`.
 
 ## Phase 3 — End-to-end verification + final cleanup commit
 
-1. `cd .lintcn && go build ./... && go test -v ./...` — all green.
+1. `cd .lintcn && go build ./... && TSGOLINT_SNAPSHOT_CWD=true go test -v ./...` — all green.
 2. `npx lintcn lint` against `old/fixtures/` trees — each rule fires on its
    fixture's violations; glob gating respected; severities correct.
 3. Spot-check snapshots for message quality (they are the agent-facing output).
-4. Final commit deletes whatever remains under `old/` once empty (fixtures
-   trees move or go with their last consumer; `old/archlint`, `old/internal`
-   go with the last rule that consumed them) — the tree ends with no dead
-   `old/` residue.
+4. Final commit deletes `old/` wholesale (decision 1): all remaining rules,
+   fixtures, docs, archlint — nothing of the old fork survives.
 5. Decide: keep `tsconfig.json` scoped to fixtures, or add a demo lint target.
 
 ## Open questions (resolved by default)

@@ -13,7 +13,7 @@ import "github.com/typescript-eslint/tsgolint/internal/rule"
 // file matches none of the patterns gets no listeners at all.
 func Gated(files []string, run func(ctx rule.RuleContext, options any) rule.RuleListeners) func(ctx rule.RuleContext, options any) rule.RuleListeners {
 	return func(ctx rule.RuleContext, options any) rule.RuleListeners {
-		if !Includes(files, ctx.SourceFile.FileName()) {
+		if ctx.SourceFile == nil || !Includes(files, ctx.SourceFile.FileName()) {
 			return nil
 		}
 		return run(ctx, options)

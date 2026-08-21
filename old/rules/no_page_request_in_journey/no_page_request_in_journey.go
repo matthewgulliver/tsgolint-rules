@@ -1,16 +1,15 @@
-// lintcn:name no-page-request-in-journey
-// lintcn:severity warn
-// lintcn:description Disallow page.request in e2e journeys — it bypasses the browser the journey exists to prove
-
 package no_page_request_in_journey
 
 import (
 	"strings"
 
 	"github.com/microsoft/typescript-go/shim/ast"
+	"github.com/typescript-eslint/tsgolint/internal/archrule"
 	"github.com/typescript-eslint/tsgolint/internal/rule"
-	"github.com/typescript-eslint/tsgolint/lintcn-rules/archkit"
+	"github.com/typescript-eslint/tsgolint/internal/archtypes"
 )
+
+const ruleName = "no-page-request-in-journey"
 
 var defaultFiles = []string{"**/e2e/**"}
 
@@ -23,8 +22,8 @@ func buildPageRequestMessage() rule.RuleMessage {
 }
 
 func isPlaywrightPage(ctx rule.RuleContext, expression *ast.Node) bool {
-	for _, constituent := range archkit.Constituents(ctx.TypeChecker.GetTypeAtLocation(expression)) {
-		for _, file := range archkit.DeclaringFiles(constituent) {
+	for _, constituent := range archtypes.Constituents(ctx.TypeChecker.GetTypeAtLocation(expression)) {
+		for _, file := range archtypes.DeclaringFiles(constituent) {
 			normalized := strings.ReplaceAll(file, "\\", "/")
 			if strings.Contains(normalized, "/node_modules/@playwright/") {
 				return true
@@ -34,12 +33,9 @@ func isPlaywrightPage(ctx rule.RuleContext, expression *ast.Node) bool {
 	return false
 }
 
-var NoPageRequestInJourneyRule = rule.Rule{
-	// Inline literal: lintcn's discovery matches `Name: "..."` in the source to
-	// bind the CLI name to this rule, so a const would silently desynchronize
-	// from lintcn:name above.
-	Name: "no-page-request-in-journey",
-	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, _ any) rule.RuleListeners {
+var NoPageRequestInJourneyRule = archrule.Rule{Files: defaultFiles, Rule: rule.Rule{
+	Name: ruleName,
+	Run: func(ctx rule.RuleContext, _ any) rule.RuleListeners {
 		return rule.RuleListeners{
 			ast.KindPropertyAccessExpression: func(node *ast.Node) {
 				access := node.AsPropertyAccessExpression()
@@ -51,5 +47,5 @@ var NoPageRequestInJourneyRule = rule.Rule{
 				}
 			},
 		}
-	}),
-}
+	},
+}}
