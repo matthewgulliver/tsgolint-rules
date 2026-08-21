@@ -1,8 +1,5 @@
 # stored-state-switch-has-a-throwing-default
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports a `switch` in a driven adapter whose discriminant is a property of a
@@ -14,7 +11,7 @@ Two `messageId`s: `storedStateSwitchWithoutDefault` and
 
 ### Why is this bad?
 
-[`aggregate-reconstitution.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/aggregate-reconstitution.md)
+`aggregate-reconstitution.md`
 writes the mapper's `default` as a `never` binding and a `throw`, and the reason
 is not exhaustiveness. **The row type is a claim about the database, not a fact
 about it.** A column typed `"Open" | "Settled"` can hold `"Archived"` — written
@@ -93,7 +90,7 @@ test-only surface.
 | `rowTypeFiles` | `string[]` | `["**/adapters/driven/**"]` | Where a persistence row type is declared. A discriminant whose object resolves to a type declared here is a stored one. |
 
 The two default to the same tree because that is where
-[`no-row-type-in-domain`](no-row-type-in-domain.md) keeps a row: the adapter
+`no-row-type-in-domain` keeps a row: the adapter
 declares it, and the domain never names it.
 
 ### Limitations
@@ -111,9 +108,9 @@ declared in the clause does *not* count.
 **Provenance is approximated by the declaring file, not traced.** A row type
 declared outside `rowTypeFiles` is invisible here, and a non-row type that
 happens to be declared in the adapter tree is treated as stored. Real dataflow
-— did this value come out of a query? — is not a type question, which is why
-[the sibling proposal about brand factories](https://github.com/matthewgulliver/typescript-examples/blob/main/reports/follow-ups/ledger.md)
-was refused rather than approximated.
+— did this value come out of a query? — is not a type question, which is
+why a sibling proposal about brand factories was refused rather than
+approximated.
 
 **It says nothing about what is thrown.** `use-case-throws-a-domain-error` is
 the rule with an opinion there, and it does not judge this tree.

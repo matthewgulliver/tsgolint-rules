@@ -1,8 +1,5 @@
 # no-constructed-collaborators
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports a `new` expression inside the hexagon whose constructed type is
@@ -14,7 +11,7 @@ it. It does not read the name being constructed.
 
 ### Why is this bad?
 
-[`command-use-case.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/command-use-case.md) says a
+`command-use-case.md` says a
 use case constructs no dependency: it receives its collaborators as ports so a
 test can substitute a fake and the composition root stays the one place that
 knows which provider is wired. A `new Pool()` in application policy pins the

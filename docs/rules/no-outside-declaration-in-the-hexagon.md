@@ -1,8 +1,5 @@
 # no-outside-declaration-in-the-hexagon
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an import inside the hexagon whose binding — after aliases are followed —
@@ -12,8 +9,8 @@ target module of a side-effect `import "…"` and of an `export … from "…"`.
 imports count.
 
 It is the type-aware complement of
-[`no-driven-import-in-query-use-case`](no-driven-import-in-query-use-case.md) and
-[`no-driving-adapter-import-in-use-case`](no-driving-adapter-import-in-use-case.md),
+`no-driven-import-in-query-use-case` and
+`no-driving-adapter-import-in-use-case`,
 which read the specifier text: a tsconfig `paths` alias, a workspace package
 name resolving to a repository path, and a barrel that re-exports an adapter all
 land on text those rules cannot test and on a declaring file this rule can. A
@@ -21,9 +18,9 @@ plain relative import reports under both, which is fine — the messages agree.
 
 ### Why is this bad?
 
-[`driven-port.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/driven-port.md) puts ports inside
+`driven-port.md` puts ports inside
 beside their consumer and adapters outside, and
-[`route-handler.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/adapters/route-handler.md) says the adapter
+`route-handler.md` says the adapter
 calls the application and is never called by it. An inside file that depends on
 an outside declaration — however the import was spelled — can no longer be
 driven by a test, a CLI or a second transport without that adapter, and a change

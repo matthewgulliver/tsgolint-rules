@@ -1,8 +1,5 @@
 # no-double-library-in-domain-test
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports `fn`, `mock`, and `spyOn` calls in a domain test when their receiver
@@ -11,7 +8,7 @@ object with the same method name is not reported.
 
 ### Why is this bad?
 
-[`domain-test.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/tests/domain-test.md) defines its subject as
+`domain-test.md` defines its subject as
 a pure aggregate command or domain service: it has no collaborators to fake.
 A mock-library double in that test is evidence that collaboration leaked into
 the domain boundary.

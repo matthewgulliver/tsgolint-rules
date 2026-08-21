@@ -1,8 +1,5 @@
 # no-provider-type-in-signature
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Four failures on one subject: the types written in the hexagon's signatures.
@@ -41,7 +38,7 @@ holding the ids.
 
 ### Why it is type-aware
 
-The syntactic [`port-speaks-domain-language`](port-speaks-domain-language.md)
+The syntactic `port-speaks-domain-language`
 catches *spellings*; rename the import (`import type { Context as Ambient }`)
 and it goes quiet. Ownership of a declaration cannot be renamed, and it is what
 tells the platform's `Request` from a domain `PledgeRequest`.

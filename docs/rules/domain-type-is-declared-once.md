@@ -1,8 +1,5 @@
 # domain-type-is-declared-once
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an exported `interface` or `type` in the domain tree whose name is also
@@ -15,7 +12,7 @@ judged tree, and the files declaring it — and compares within a context.
 
 ### Why is this bad?
 
-[`aggregate-root.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/aggregate-root.md) states it on the
+`aggregate-root.md` states it on the
 type itself: the canonical `Occasion` is imported everywhere and redefined
 nowhere.
 
@@ -35,7 +32,7 @@ either. Only the program has both.
 
 ### It compares within one context, deliberately
 
-[`bounded-context.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/bounded-context.md) §2.1 is the
+`bounded-context.md` §2.1 is the
 language test: the same word meaning different things in two contexts is the
 boundary working. Gifting's `Occasion` and Notifications' `Occasion` are two
 concepts, and reporting them would be arguing against the doc that motivates the

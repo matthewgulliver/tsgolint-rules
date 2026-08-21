@@ -1,8 +1,5 @@
 # domain-function-returns-an-answer
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an **exported** function in the domain tree that carries no written
@@ -11,12 +8,12 @@ path — a `function` declaration, or a `const` bound to an arrow or function
 expression. A curried chain is followed to the type its last call answers with.
 
 A signature with a written return type is left alone: the written `: void` is
-[`no-void-return-in-domain`](no-void-return-in-domain.md)'s subject, and this
+`no-void-return-in-domain`'s subject, and this
 rule is its complement, so the two never report the same function.
 
 ### Why is this bad?
 
-[`aggregate-root.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/aggregate-root.md): every command
+`aggregate-root.md`: every command
 "either preserves the invariant or returns an explicit refusal". A function that
 returns nothing decided something and put the answer somewhere the model cannot
 show — a mutated argument, a provider it called — so the caller learns neither
@@ -67,7 +64,7 @@ test-only surface.
 ### Limitations
 
 **`Promise<void>` is not unwrapped.** The domain is synchronous, and a promise
-here is [`no-async-in-domain`](no-async-in-domain.md)'s report; a function that
+here is `no-async-in-domain`'s report; a function that
 answers with a promise of nothing passes this rule.
 
 **A union with an answer passes.** `Occasion | undefined` is a lookup that

@@ -1,8 +1,5 @@
 # domain-probe-returns-void
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an exported port declaration whose name matches `probeNamePatterns`

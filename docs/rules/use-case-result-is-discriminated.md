@@ -1,8 +1,5 @@
 # use-case-result-is-discriminated
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Two failures on one subject: the resolved result of an exported function
@@ -60,15 +57,15 @@ one would be duplicating a shipped rule under a local name.
 
 ### The domain tree
 
-Both [`aggregate-root.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/aggregate-root.md) and
-[`domain-service.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/domain-service.md) make the same
+Both `aggregate-root.md` and
+`domain-service.md` make the same
 claim one tree over — the aggregate's `PledgeCommandResult` ("every state
 transition either returns a new valid occasion or an explicit business
 refusal") and the domain service's `PledgeDecision` — so the domain tree is a
 `files` entry, not a second rule. Both ledgers proposed it independently.
 
 This is the **union half** of "returns the next state or an explicit refusal".
-The return half is [`no-void-return-in-domain`](no-void-return-in-domain.md),
+The return half is `no-void-return-in-domain`,
 which is syntactic: it reads a written `void` annotation. A transition whose
 `void` is inferred rather than written escapes that rule, and is not this one's
 subject either — a `void` return is not a union.
@@ -79,7 +76,7 @@ Both docs' Perfect Examples discriminate on a boolean literal
 **A factory is not this rule's subject.** Both precedents above are state
 transitions. A factory returns its value or throws — an invariant violation is a
 bug, not an outcome a caller handles — so there is no union to discriminate.
-`createMoney` in [`shared-kernel.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/shared-kernel.md) is
+`createMoney` in `shared-kernel.md` is
 the tree's one factory and it throws, per
 `domain-driven-design/resources/error-modeling.md:21-48`. A factory written as
 `T | Refusal` instead is a modelling mistake this rule will not catch for you:
@@ -141,7 +138,7 @@ test-only surface.
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges. |
-| `failureReasonMemberPatterns` | `string[]` | `["^error$", "^violations$", "^faults$", "^problems$"]` | Result members whose resolved type may not admit any `string`. The three plurals are the names a batch-shaped refusal takes, and no Perfect Example or skill declares one. `reason` is left to configuration: [`bounded-context.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/bounded-context.md) and [`domain-probe.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/domain-probe.md) declare `reason: string` in their own Perfect Examples. `errors` is deliberately absent — it is RFC 9457's validation-error array, endorsed by example in `api-design/resources/problem-details.md:51-54`. [`no-generic-failure-reason`](no-generic-failure-reason.md) draws the same lines syntactically. |
+| `failureReasonMemberPatterns` | `string[]` | `["^error$", "^violations$", "^faults$", "^problems$"]` | Result members whose resolved type may not admit any `string`. The three plurals are the names a batch-shaped refusal takes, and no Perfect Example or skill declares one. `reason` is left to configuration: `bounded-context.md` and `domain-probe.md` declare `reason: string` in their own Perfect Examples. `errors` is deliberately absent — it is RFC 9457's validation-error array, endorsed by example in `api-design/resources/problem-details.md:51-54`. `no-generic-failure-reason` draws the same lines syntactically. |
 
 ### Limitations
 

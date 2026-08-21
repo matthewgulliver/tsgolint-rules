@@ -1,8 +1,5 @@
 # published-contract-publishes-no-mutable-value
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an exported `const` in a published contract file whose **resolved type**
@@ -14,7 +11,7 @@ Two `messageId`s, because freezing an object is not the repair for a published
 
 ### Why is this bad?
 
-[`bounded-context.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/bounded-context.md) §2.3: "never
+`bounded-context.md` §2.3: "never
 share mutable state between contexts — communicate via events or explicit
 contracts". A published mutable value is a channel nobody declared. One context
 writes, another reads a different value than it did a moment ago, and the change
@@ -23,7 +20,7 @@ appears in no event, no contract and no diff.
 ### Why it is type-aware
 
 This is the recorded blind spot of the syntactic
-[`no-mutable-export-in-public-contract`](no-mutable-export-in-public-contract.md).
+`no-mutable-export-in-public-contract`.
 These two are the same syntax — an exported `const` bound to a call — and
 opposite contracts:
 

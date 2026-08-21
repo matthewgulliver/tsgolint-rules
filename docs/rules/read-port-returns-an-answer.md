@@ -1,8 +1,5 @@
 # read-port-returns-an-answer
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports a **read port** — an exported declaration in the ports tree whose name
@@ -18,7 +15,7 @@ reviewer skims past, because the port's name says the whole file is a question.
 
 ### Why it is type-aware, and how it differs from the JS rule
 
-[`arch/read-port-writes-nothing`](read-port-writes-nothing.md) judges the same
+`arch/read-port-writes-nothing` judges the same
 declarations by **member name**, against a list of write verbs. The two catch
 different mistakes:
 

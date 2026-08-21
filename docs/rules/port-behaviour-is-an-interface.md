@@ -1,8 +1,5 @@
 # port-behaviour-is-an-interface
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an exported `type` alias in the ports tree that carries behaviour, by
@@ -17,10 +14,10 @@ driven-port doc reserves `type` for.
 
 ### Why is this bad?
 
-[`driven-port.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/driven-port.md) draws the line as
+`driven-port.md` draws the line as
 `interface` for behaviour contracts, `type` and schemas for pure data shapes, so
 a reader can tell at a glance which declarations an adapter has to satisfy.
-[`driving-port.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/driving-port.md) sharpens the
+`driving-port.md` sharpens the
 bare-function case: the interface is the **role**, the method is the operation.
 Export the function type and the role has no name — an adapter holds a callable
 rather than a collaborator, and the actor's second operation arrives as a second
@@ -28,7 +25,7 @@ injected parameter threaded through every construction site instead of one more
 method nobody had to re-plumb.
 
 This is why the rule is type-aware. The syntactic
-[`port-contract-is-an-interface`](port-contract-is-an-interface.md) records the
+`port-contract-is-an-interface` records the
 gap in its own Limitations: a member typed through an alias
 (`readonly pledgeToOccasion: PledgeToOccasion`) "reads as data and escapes
 `behaviourContractAsTypeAlias` — the more indirection, the less this rule sees".
@@ -118,14 +115,14 @@ that it is incremental.
 **A callable written in place belongs to the syntactic rule.** An exported alias
 whose type is written `(x: T) => U`, or whose type literal has a member written
 that way, is reported by
-[`port-contract-is-an-interface`](port-contract-is-an-interface.md) and is
+`port-contract-is-an-interface` and is
 deliberately silent here — both firing turned one mistake into two diagnostics
 saying nearly the same sentence. What is left is what that rule cannot see: a
 member typed through an alias, an alias of an alias, an intersection, and any
 declaration it does not open, which is every non-exported one.
 
 **Scope is the rule's own**, from the `files` above. Before anything scoped this
-rule it reported `Context` and `Visitor` in [`packages/oxlint/rule.ts`](https://github.com/matthewgulliver/typescript-examples/blob/main/packages/oxlint/rule.ts) —
+rule it reported `Context` and `Visitor` in `packages/oxlint/rule.ts` —
 right about those aliases, and wrong to be looking at them.
 
 Only type alias declarations. An `interface` holding nothing but data fields is

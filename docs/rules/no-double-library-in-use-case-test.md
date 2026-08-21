@@ -1,8 +1,5 @@
 # no-double-library-in-use-case-test
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports `fn`, `mock`, and `spyOn` calls in a use-case test — a `*.test.ts(x)`
@@ -14,21 +11,19 @@ matcher, one tree over, a different repair.
 
 ### Why is this bad?
 
-[`driven-port.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/driven-port.md) says every driven
+`driven-port.md` says every driven
 port gets a stateful in-memory fake, *never a mock*, and lists "doubled by
 mock-verifying call sequences" as an anti-pattern;
-[`driving-port.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/driving-port.md) refuses a
-mock-verifying test driver; [`in-memory-fake.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/tests/in-memory-fake.md)
+`driving-port.md` refuses a
+mock-verifying test driver; `in-memory-fake.md`
 names the double for its role — `createFake…`, `createStub…`, `createSpy…` —
 never for the library that made it, because a hand-written double implements
 the port's real interface and a contract change breaks at compile time. A
 `vi.fn()` standing in for a port is scaffolding that a renamed member never
 reaches.
 
-This reverses one row of
-[`reports/decompose-use-case-test/ledger.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/reports/decompose-use-case-test/ledger.md)
-and [`reports/decompose-in-memory-fake/ledger.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/reports/decompose-in-memory-fake/ledger.md)
-— the library-double slice only. Whether a fake or a spy was the right double,
+This reverses one row of the original decomposition ledgers — the
+library-double slice only. Whether a fake or a spy was the right double,
 and whether an assertion is adequate, stay refused.
 
 ### Why it is type-aware

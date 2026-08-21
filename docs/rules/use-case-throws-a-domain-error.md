@@ -1,8 +1,5 @@
 # use-case-throws-a-domain-error
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports a `throw` inside the hexagon whose thrown value resolves to a type
@@ -80,7 +77,7 @@ test-only surface.
 
 | Option | Type | Default | What it does |
 |---|---|---|---|
-| `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges. The domain scope carries the driven doc's "the domain never catches HTTP errors, manages transactions or leaks a logger" family; the catch clause of that sentence is [`arch/no-catch-in-domain`](no-catch-in-domain.md). |
+| `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges. The domain scope carries the driven doc's "the domain never catches HTTP errors, manages transactions or leaks a logger" family; the catch clause of that sentence is `arch/no-catch-in-domain`. |
 | `standardLibraryFiles` | `string[]` | `["**/hexagon/application/**"]` | Of those trees, the ones where a **standard-library** throw also reports. A repository that wants the stricter reading adds its domain tree. |
 
 **Why the standard-library arm skips the domain by default.** A bare `Error` is

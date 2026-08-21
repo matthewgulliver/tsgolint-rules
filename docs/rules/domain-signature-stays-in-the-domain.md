@@ -1,8 +1,5 @@
 # domain-signature-stays-in-the-domain
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an exported function in the domain tree whose parameter or return
@@ -18,7 +15,7 @@ Two `messageId`s, because the two halves are different repairs:
 
 ### Why is this bad?
 
-[`domain-service.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/domain-service.md) §2 is that the
+`domain-service.md` §2 is that the
 service "takes domain values and returns domain results only", and §5 that
 "everything it decides with arrives as an argument". A signature is where that
 promise is kept or broken.
@@ -93,16 +90,15 @@ test-only surface.
 
 The shared kernel is in `ownFiles` because `Money` is the domain's own
 vocabulary, published one level up —
-[`shared-kernel.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/shared-kernel.md) is the doc that
+`shared-kernel.md` is the doc that
 argues it.
 
 ### Limitations
 
 **The standard library is always allowed, and is not configurable.** Without
 that carve-out the rule flags `Date`, `ReadonlyArray` and `Promise`, which is to
-say every domain type in the repository. It is the trap the
-[domain-service ledger](https://github.com/matthewgulliver/typescript-examples/blob/main/reports/decompose-domain-service/ledger.md) named
-when it proposed the rule, and it is designed around rather than left to
+say every domain type in the repository. It is the trap named when the
+rule was first proposed, and it is designed around rather than left to
 configuration.
 
 **A package dependency's type *alias* is excused**, on the precedent

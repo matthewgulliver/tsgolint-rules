@@ -1,8 +1,5 @@
 # context-model-does-not-cross-the-boundary
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports an exported function, `interface` or `type` in one bounded context whose
@@ -11,7 +8,7 @@ that type arrived.
 
 A context's identity comes from a `(?<name>…)` capture over the file path, the
 same decision
-[`no-cross-context-internal-import`](no-cross-context-internal-import.md)
+`no-cross-context-internal-import`
 records: one context spelled two ways must capture the same text, or an
 intra-context reference reads as a crossing.
 
@@ -19,7 +16,7 @@ intra-context reference reads as a crossing.
 
 ### Why is this bad?
 
-[`bounded-context.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/bounded-context.md) §2.3: an
+`bounded-context.md` §2.3: an
 Anti-Corruption Layer exists so that an external model's types never leak into
 yours. §2.4 adds that what a context publishes is versioned and kept stable.
 
@@ -100,10 +97,8 @@ configured separately and kept in step.
 **A file no pattern identifies is not judged.** The rule returns before
 comparing anything, so a `contextRootPatterns` entry whose `name` group does not
 exist switches this rule off and shows a green run. That is the shipped
-precedent and the failure
-[`reports/decompose-shared-kernel/ledger.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/reports/decompose-shared-kernel/ledger.md)
-records having actually hit. Whether a pattern that captures nothing should be a
-config error rather than a silent pass is still open.
+precedent, and a failure this has actually hit. Whether a pattern that
+captures nothing should be a config error rather than a silent pass is still open.
 
 **Two unidentified files compare equal.** Both answer `""`, so a repository with
 no `packages/` layout has one implicit context rather than none.

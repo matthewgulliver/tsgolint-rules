@@ -1,8 +1,5 @@
 # no-page-request-in-journey
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports `page.request` in an E2E tree only when the receiver resolves to
@@ -11,7 +8,7 @@ and a test's standalone API `request` fixture, are not reported.
 
 ### Why is this bad?
 
-[`e2e-test.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/tests/e2e-test.md) reserves a journey claim for
+`e2e-test.md` reserves a journey claim for
 work the browser caused through accessible UI. Playwright's `page.request` is
 Node-side HTTP: it can pass while the UI handler, browser cookies, CSRF/Fetch
 Metadata, redirects, or rendering are broken.

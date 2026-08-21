@@ -1,8 +1,5 @@
 # domain-state-is-deeply-readonly
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Follows the members of every **exported** `interface` and `type` in the domain
@@ -22,8 +19,8 @@ too: `ReadonlyArray<Pledge>` where `Pledge` has a writable `amount` reports.
 
 What it deliberately leaves to the syntactic rules: a member written mutable in
 the judged declaration itself — no `readonly`, or a written `T[]` / `Array<T>` —
-is [`domain-state-is-readonly`](domain-state-is-readonly.md)'s and
-[`shared-kernel-export-is-an-immutable-value`](shared-kernel-export-is-an-immutable-value.md)'s
+is `domain-state-is-readonly`'s and
+`shared-kernel-export-is-an-immutable-value`'s
 report, and a member of *another* exported declaration is reported when that
 declaration is visited, not through every type that names it. Callable members
 are behaviour, not state, and are skipped; members the standard library or a
@@ -31,9 +28,9 @@ package declares are not the model's.
 
 ### Why is this bad?
 
-[`aggregate-root.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/aggregate-root.md): the root is the
+`aggregate-root.md`: the root is the
 only write surface, and `ReadonlyArray` and immutable values are what stop a
-caller altering the collection directly. [`shared-kernel.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/domain/shared-kernel.md):
+caller altering the collection directly. `shared-kernel.md`:
 `Money` is immutable. A `readonly` keyword on the outer member keeps that
 promise only as far as the type it names — one unexported `FundingState` with a
 bare `pledges: Pledge[]`, or one `type PledgeList = Pledge[]`, and the aggregate

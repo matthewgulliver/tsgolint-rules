@@ -1,8 +1,5 @@
 # driving-port-command-is-modelled
 
-Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
-`oxlint`.
-
 ### What it does
 
 Reports a **driving port** — a declaration in the ports tree whose name matches
@@ -11,7 +8,7 @@ Reports a **driving port** — a declaration in the ports tree whose name matche
 
 ### Why is this bad?
 
-[`driving-port.md`](https://github.com/matthewgulliver/typescript-examples/blob/main/docs/examples/application/driving-port.md) says the driving
+`driving-port.md` says the driving
 port takes typed application commands. A method taking `(occasionId: string)`
 accepts every string in the program: a contributor id, a slug, an empty string,
 a value read straight off a query parameter. The port carries no vocabulary of
