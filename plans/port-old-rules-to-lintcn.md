@@ -6,6 +6,11 @@
   (`go build`, `go test`, `npx lintcn lint` all work). Root `tsconfig.json`
   added (scopes lint to `old/**/*.ts`).
 - Seed rule `no_floating_promises` added for verification, then removed.
+- Phase 2 in progress. Ported and committed: `no_page_request_in_journey`,
+  `use_case_throws_a_domain_error`, `stored_state_switch_has_a_throwing_default`,
+  `use_case_result_is_discriminated`, `domain_function_returns_an_answer`,
+  `domain_probe_returns_void`. Remaining work is owned by two parallel porter
+  agents (`.opencode/agents/porter-hexagon.md`, `.opencode/agents/porter-tests.md`).
 
 ## Findings driving the design
 
@@ -69,6 +74,25 @@ Mutation: archkit 100% efficacy (2 recorded cross-package survivors), rule
 package 100%/100%.
 
 ## Phase 2 — Port rules in dependency-risk order (TDD per rule)
+
+### Porting is parallelized across two subgroups (commits stay serial)
+
+The remaining rules are split into two subgroups, each owned by a porter
+agent (`.opencode/agents/`), both on `deepseek/deepseek-v4-flash`:
+
+- **porter-hexagon**: `no_outside_declaration_in_the_hexagon`,
+  `domain_signature_stays_in_the_domain`, `domain_type_is_declared_once`,
+  `domain_state_is_deeply_readonly`, `port_behaviour_is_an_interface`,
+  `driving_port_command_is_modelled`, `read_port_returns_an_answer`,
+  `no_provider_type_in_signature`,
+  `published_contract_publishes_no_mutable_value`, `no_constructed_collaborators`,
+  `context_model_does_not_cross_the_boundary`.
+- **porter-tests** (glob-gated, last): `no_double_library_in_domain_test`,
+  `no_double_library_in_use_case_test`.
+
+Each agent ports one rule at a time and reports without committing. Commits
+still land one rule per commit, serialized on the same branch (no parallel
+commits — the agents prepare work, a human or coordinating agent commits).
 
 ### Commit discipline (one rule per commit)
 
