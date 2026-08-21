@@ -1,6 +1,6 @@
 # no-provider-type-in-signature
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -106,6 +106,11 @@ export const pledge = (principal: AuthenticatedPrincipal) => principal.userId
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges — both halves of the inside, because the claim is about the inside as a whole. Not `**/hexagon/**`: that also matches `hexagon/adapters/**`, where holding the transport is the adapter's job. |
@@ -115,9 +120,8 @@ export const pledge = (principal: AuthenticatedPrincipal) => principal.userId
 ### How to use
 
 ```bash
-./archlint/build.sh
-./archlint/build.sh --test
-archlint
+npx lintcn lint            # build the binary if needed, then run it
+cd .lintcn && TSGOLINT_SNAPSHOT_CWD=true go test ./...   # the rule tests
 ```
 
 ### Limitations
@@ -139,5 +143,5 @@ not one reports. Only a symbol this repository declares brands anything —
 `string` carries `[Symbol.iterator]` from the standard library and does not
 count.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.

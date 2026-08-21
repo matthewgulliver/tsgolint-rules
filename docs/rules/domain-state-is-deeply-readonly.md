@@ -1,6 +1,6 @@
 # domain-state-is-deeply-readonly
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -80,6 +80,11 @@ export type Occasion = { id: string; pledges: string[] }
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/domain/**", "**/shared-kernel/**"]` | The trees this rule judges. |
@@ -103,5 +108,5 @@ subject rather than this rule's.
 **Reports land on the exported declaration's name**, with the member path in
 the message; the fix is where the path ends.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.

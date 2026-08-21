@@ -1,6 +1,6 @@
 # domain-probe-returns-void
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -32,6 +32,11 @@ export interface PledgeInstrumentation {
 ```
 
 ### Options
+
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
 
 | Option | Type | Default | What it does |
 |---|---|---|---|

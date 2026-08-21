@@ -1,6 +1,6 @@
 # use-case-throws-a-domain-error
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -73,6 +73,11 @@ return { outcome: "conflict" }
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges. The domain scope carries the driven doc's "the domain never catches HTTP errors, manages transactions or leaks a logger" family; the catch clause of that sentence is [`arch/no-catch-in-domain`](no-catch-in-domain.md). |
@@ -98,7 +103,7 @@ declaration to judge, and guessing is how a rule starts reporting on nothing.
 thrown where the docs would have returned an outcome passes. That is the
 modelling half, and it stays with human review.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.
 
 **A business rule thrown as a bare `Error` in the domain now passes.** That is

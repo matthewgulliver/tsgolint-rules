@@ -1,6 +1,6 @@
 # use-case-result-is-discriminated
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -54,7 +54,7 @@ the page.
 ### The other half of the claim is already shipped
 
 "…and handles it **exhaustively**" is not this rule. tsgolint's upstream
-`switch-exhaustiveness-check` already runs in `archlint` — it is
+`switch-exhaustiveness-check` already runs in the same binary — it is
 compiled into the same binary and needs no configuration here. Writing a second
 one would be duplicating a shipped rule under a local name.
 
@@ -133,6 +133,11 @@ export const findOccasion = async (): Promise<Occasion | null> => null
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges. |
@@ -162,5 +167,5 @@ use case in the docs. **Nested collections are followed four deep**, and only
 arrays and tuples count as collections — a `ReadonlySet<string>` reports
 nothing.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.

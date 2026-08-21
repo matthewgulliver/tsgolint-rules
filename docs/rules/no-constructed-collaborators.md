@@ -1,6 +1,6 @@
 # no-constructed-collaborators
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -67,6 +67,11 @@ export const createPledgingToOccasions =
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/application/**", "**/hexagon/domain/**"]` | The trees this rule judges. `**` spans any number of segments. |
@@ -74,9 +79,8 @@ export const createPledgingToOccasions =
 ### How to use
 
 ```bash
-./archlint/build.sh
-./archlint/build.sh --test
-archlint
+npx lintcn lint            # build the binary if needed, then run it
+cd .lintcn && TSGOLINT_SNAPSHOT_CWD=true go test ./...   # the rule tests
 ```
 
 ### Limitations
@@ -94,5 +98,5 @@ narrower one.
 **Only `new`.** A factory call (`createPool()`) constructs a dependency without
 the keyword and is not reported.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.

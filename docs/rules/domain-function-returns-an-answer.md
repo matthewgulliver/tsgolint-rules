@@ -1,6 +1,6 @@
 # domain-function-returns-an-answer
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -55,6 +55,11 @@ export const settleWith = (o: Occasion): void => { audit(o) }
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/domain/**"]` | The trees this rule judges. |
@@ -75,5 +80,5 @@ function initialisers. A module-private helper is a local choice.
 explicit and the result discriminates is
 [`use-case-result-is-discriminated`](use-case-result-is-discriminated.md)'s.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.

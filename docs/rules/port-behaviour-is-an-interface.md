@@ -1,6 +1,6 @@
 # port-behaviour-is-an-interface
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -93,6 +93,11 @@ export interface PledgePersistence {
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/ports/**"]` | The trees this rule judges. `**` spans any number of segments. |
@@ -101,9 +106,8 @@ export interface PledgePersistence {
 ### How to use
 
 ```bash
-./archlint/build.sh   # clone if needed, inject rules, compile
-./archlint/build.sh --test    # go test over every package in rules/
-archlint  # run it
+npx lintcn lint            # build the binary if needed, then run it
+cd .lintcn && TSGOLINT_SNAPSHOT_CWD=true go test ./...   # the rule tests
 ```
 
 First build clones tsgolint and typescript-go and takes a few minutes; after
@@ -120,7 +124,7 @@ saying nearly the same sentence. What is left is what that rule cannot see: a
 member typed through an alias, an alias of an alias, an intersection, and any
 declaration it does not open, which is every non-exported one.
 
-**Scope is `archlint`'s**, from the `files` above. Before anything scoped this
+**Scope is the rule's own**, from the `files` above. Before anything scoped this
 rule it reported `Context` and `Visitor` in [`packages/oxlint/rule.ts`](https://github.com/matthewgulliver/typescript-examples/blob/main/packages/oxlint/rule.ts) —
 right about those aliases, and wrong to be looking at them.
 

@@ -1,6 +1,6 @@
 # stored-state-switch-has-a-throwing-default
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -27,7 +27,7 @@ then somewhere else, in something that read a field that is not there.
 
 ### Why it is type-aware, and why upstream does not cover it
 
-`switch-exhaustiveness-check` already runs in `archlint` and is
+`switch-exhaustiveness-check` already runs in the same binary and is
 **satisfied by exhaustive cases and no `default` at all** — which is exactly the
 code this rule reports. The two rules want different things and both are right:
 upstream wants every declared case handled, this one wants the undeclared case
@@ -82,6 +82,11 @@ switch (command.state) {
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/adapters/driven/**"]` | The trees this rule judges. |
@@ -113,5 +118,5 @@ was refused rather than approximated.
 **It says nothing about what is thrown.** `use-case-throws-a-domain-error` is
 the rule with an opinion there, and it does not judge this tree.
 
-**Scope is `archlint`'s**, from the `files` above. The rule judges the file it
+**Scope is the rule's own**, from the `files` above. The rule judges the file it
 is handed and carries no scope check of its own.

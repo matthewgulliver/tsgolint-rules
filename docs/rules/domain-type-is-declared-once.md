@@ -1,6 +1,6 @@
 # domain-type-is-declared-once
 
-Type-aware. Written in Go, run by `archlint`, **not** by
+Type-aware. Written in Go, run by `npx lintcn lint`, **not** by
 `oxlint`.
 
 ### What it does
@@ -69,6 +69,11 @@ export type Occasion = { readonly id: OccasionId; readonly budget: Money }
 
 ### Options
 
+These are the values the rule uses. They are **not** overridable through
+lintcn today: `runner.go` passes `nil` options to every rule on every file,
+so the defaults below are the shipped behaviour and the option names are a
+test-only surface.
+
 | Option | Type | Default | What it does |
 |---|---|---|---|
 | `files` | `string[]` | `["**/hexagon/domain/**"]` | The trees this rule judges, and the trees it indexes. |
@@ -100,6 +105,6 @@ context is meant to have one meaning per word.
 **The index is built once per program and cached.** A rule that rebuilt it per
 file would be quadratic over the repository.
 
-**Scope is `archlint`'s**, from the `files` above — and this is the one rule
-`archlint` hands its resolved tree to, because the tree is also what the index
+**Scope is the rule's own**, from the `files` above — and this is the one rule
+the rule hands its resolved tree to, because the tree is also what the index
 reads. Every other rule judges the file it is handed and never sees a glob.
