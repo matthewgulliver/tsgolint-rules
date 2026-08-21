@@ -21,9 +21,9 @@ Enforcement column. Items grounded in vendored source cite the file.
 | `CONV` | This repository's convention, encoded in the plop generator and the 19 existing rules. No tool enforces it; violating it is a review finding. |
 | `MUTATION` | The `gremlins unleash ./<rule>/` gate from `.agents/skills/go-tdd-mutation/SKILL.md`. |
 
-Sources per section. `SKILL.md` means `.agents/skills/lintcn/SKILL.md`; `PORT.md` means
-`docs/in-progress/port-old-rules-to-lintcn.md`. Where those two disagree with the 19 rules,
-the rules win and the disagreement is recorded in *Received wisdom that is now wrong*.
+Sources per section. `SKILL.md` means `.agents/skills/lintcn/SKILL.md`. Where it disagrees
+with the 19 rules, the rules win and the disagreement is recorded in *Received wisdom that is
+now wrong*.
 
 ---
 
@@ -90,7 +90,7 @@ All are optional. All are parsed by line regex `^// lintcn:(\w+) (.+)$` anywhere
 ## C. Rule structure and file gating — *scope: the `rule.Rule` value and its `Run`*
 
 Sources: `.lintcn/.tsgolint/internal/rule/rule.go`; `.lintcn/.tsgolint/internal/linter/linter.go`;
-`.lintcn/archkit/gate.go`; PORT.md §3–4.
+`.lintcn/archkit/gate.go`.
 
 | # | Proposition (YES = intended) | Applies to | Enforcement |
 | --- | --- | --- | --- |
@@ -141,7 +141,7 @@ SKILL.md § Type Checker APIs; the 16 rules that use the checker.
 | E5 | Array and tuple element types are read through `Checker_getTypeArguments`, not from type flags. | rules judging collections | RUNTIME (recorded: `readonly string[]` is a reference type, not a string-flagged one — `types.go`, `ElementTypes`) |
 | E6 | Every checker call that can return `nil` — type, symbol, declaration, source file — has an explicit arm, and that arm returns "not a violation" rather than guessing. | every typed rule | RUNTIME (panics otherwise; `types.go` centralises the common ones) |
 | E7 | A defensive nil arm that no test can reach is commented at the site with why it exists. | unreachable arms | CONV + MUTATION (`DeclaredType`'s two arms are documented this way; the alternative is a survivor with no explanation) |
-| E8 | Shared checker questions live in `archkit`, added when the first rule needs one. | every rule | CONV (PORT.md §5: porting helpers wholesale leaves unconsumed symbols that read as mutation `NOT COVERED` noise) |
+| E8 | Shared checker questions live in `archkit`, added when the first rule needs one. | every rule | CONV (porting helpers wholesale leaves unconsumed symbols that read as mutation `NOT COVERED` noise) |
 | E9 | A helper added to `archkit` is consumed by at least one rule in the same change. | every archkit addition | MUTATION (an unconsumed exported helper is a `NOT COVERED` survivor by construction) |
 | E10 | Type names put into a message come from `TypeChecker.TypeToString` or the written identifier, not from a hand-built string. | messages naming types | CONV |
 
@@ -182,11 +182,11 @@ functions and their snapshots; `plop-templates/rule.go.hbs`.
 | G2 | `Id` is camelCase and names the **violation**, not the rule. | every message | CONV (`pageRequest`, `bareFunctionTypeAlias`, `foreignReturnType` — note the plop template seeds `camelCase(rule name)` instead, which every real rule replaced) |
 | G3 | `Id` is unique within the rule, and a rule with two distinct failures has two distinct ids. | every rule | TEST (the test asserts `MessageId` per error, so a shared id makes two failures indistinguishable) |
 | G4 | `Description` says what is wrong **and what it costs**, in one sentence. | every message | CONV |
-| G5 | `Help` says what to do instead, and appears in every message. | every message | CONV (`Help` is optional in the struct; all 19 rules supply it, because PORT.md §7 dropped docs URLs and made `Help` carry the guidance) |
+| G5 | `Help` says what to do instead, and appears in every message. | every message | CONV (`Help` is optional in the struct; all 19 supply it. `rule.Rule` has no docs-URL field, so nothing links a diagnostic to `docs/rules/` — `Help` is the only guidance the reader gets in place) |
 | G6 | The message names the specific symbol it is about, backticked. | every message | CONV |
 | G7 | Interpolated names come from the AST or the checker, never from a fixed placeholder string. | every message | CONV |
 | G8 | `Description` and `Help` are complete sentences ending in a period. | every message | CONV |
-| G9 | The message has been read as rendered in the `.snap`, not just as source. | every rule | CONV (PORT.md §2; the snapshot is the agent-facing output) |
+| G9 | The message has been read as rendered in the `.snap`, not just as source. | every rule | CONV (the snapshot is the agent-facing output) |
 
 ---
 
@@ -206,7 +206,7 @@ Sources: `.lintcn/.tsgolint/internal/rule_tester/rule_tester.go`; SKILL.md § Te
 | H7 | `Output` is absent. | rules that declare no fixes | TEST (`len(testCase.Output) == len(outputs)`, both zero) |
 | H8 | No committed case carries `Only: true`. | every rule | TEST-defeating (one `Only` anywhere makes `rule_tester` `t.SkipNow()` every other case in that rule — the suite passes green while testing almost nothing) |
 | H9 | No committed case carries `Skip: true`. | every rule | CONV (same silent-green failure mode, per case) |
-| H10 | Gated rules have at least one valid case whose file is outside the gated tree, carrying code that would otherwise report. | gated rules | CONV (PORT.md §3; all 19 have one, either by omitting `FileName` — the default is `file.ts` — or by naming an out-of-tree path such as `apps/web/src/page.ts`) |
+| H10 | Gated rules have at least one valid case whose file is outside the gated tree, carrying code that would otherwise report. | gated rules | CONV (all 19 have one, either by omitting `FileName` — the default is `file.ts` — or by naming an out-of-tree path such as `apps/web/src/page.ts`) |
 | H11 | Every case that should report sets `FileName` to a path inside the gated tree. | gated rules | TEST (otherwise the gate suppresses the rule and the invalid case reports nothing) |
 | H12 | `FileName` is written relative and is matched by `defaultFiles` through a leading `**/`. | gated rules | RUNTIME (`rule_tester` resolves it against `fixtures.GetRootDir()`, which is inside the tsgolint cache, so the absolute path has an unpredictable prefix) |
 | H13 | The valid cases include near-misses — the shapes a careless implementation would flag. | every rule | CONV + MUTATION (a valid case that could never report kills no mutants) |
@@ -220,14 +220,14 @@ Sources: `.lintcn/.tsgolint/internal/rule_tester/rule_tester.go`; SKILL.md § Te
 
 ## I. Snapshots — *scope: `__snapshots__/<rule-name>.snap`*
 
-Sources: `.lintcn/.tsgolint/internal/rule_tester/snapshot.go`; PORT.md §2.
+Sources: `.lintcn/.tsgolint/internal/rule_tester/snapshot.go`.
 
 | # | Proposition (YES = intended) | Applies to | Enforcement |
 | --- | --- | --- | --- |
 | I1 | The snapshot file is committed. | every rule | CONV (it is the regression evidence and the agent-facing output) |
 | I2 | Its name is the CLI rule name plus `.snap` — not the package or folder name. | every rule | RUNTIME (`newSnapshotter(r.Name)`) |
 | I3 | It sits in `__snapshots__/` inside the rule package. | every rule | RUNTIME (only when `TSGOLINT_SNAPSHOT_CWD=true`; the variable is read once in `init()`) |
-| I4 | It was generated by `TSGOLINT_SNAPSHOT_CWD=true UPDATE_SNAPS=true go test`, never hand-copied out of the cache. | every rule | CONV (PORT.md §2) |
+| I4 | It was generated by `TSGOLINT_SNAPSHOT_CWD=true UPDATE_SNAPS=true go test`, never hand-copied out of the cache. | every rule | CONV (a hand-copied snapshot silently drifts from what the rule actually emits) |
 | I5 | Every entry corresponds to a live invalid case. | every rule | SNAPSHOT — **not enforced**: `write` merges over loaded entries and never deletes, so a removed or renumbered case leaves an orphan forever. Deleting the `.snap` and regenerating is the only cleanup. |
 | I6 | A newly added invalid case's entry was read before committing. | new cases | CONV — **not enforced**: a missing key is written and passes silently (`if update \|\| !exists`), so an unreviewed snapshot is indistinguishable from a reviewed one. |
 | I7 | Valid cases have no snapshot entries. | every rule | RUNTIME (`MatchSnapshot` is called only in the invalid loop) |
@@ -251,7 +251,7 @@ Sources: `.lintcn/.tsgolint/internal/rule_tester/snapshot.go`; PORT.md §2.
 
 ## K. TDD and the mutation gate — *scope: one rule package's development cycle*
 
-Source: `.agents/skills/go-tdd-mutation/SKILL.md`; PORT.md §8.
+Source: `.agents/skills/go-tdd-mutation/SKILL.md`.
 
 | # | Proposition (YES = intended) | Applies to | Enforcement |
 | --- | --- | --- | --- |
@@ -289,7 +289,7 @@ performance claim, because nothing here has been profiled — see *Known gaps*.
 | SKILL.md § Rule Options: rules "accept configuration via JSON". | Not through lintcn. `runner.go:292` passes `nil` for every rule on every file. Options are a test-only surface today; defaults are the shipped behaviour. |
 | SKILL.md § Snapshots: "Copy them into your rule folder for reference." | Superseded by `TSGOLINT_SNAPSHOT_CWD=true`, which writes them there directly. Hand-copying is how a snapshot silently drifts from what the rule emits. |
 | "A snapshot mismatch will catch it." | Only for an entry that already exists. A brand-new key is written and the test passes; a deleted case's key is never removed. |
-| "`meta`/docs URL/schema" — anything carried over from the ESLint or oxlint rule model. | `rule.Rule` has two fields. There is no metadata object, no options schema, no docs URL, no `recommended` preset, and no per-project rule configuration. Guidance that would have gone in docs goes in `RuleMessage.Help`. |
+| "`meta`/docs URL/schema" — anything carried over from the ESLint or oxlint rule model. | `rule.Rule` has two fields. There is no metadata object, no options schema, no docs URL, no `recommended` preset, and no per-project rule configuration. `docs/rules/` exists, but nothing links a diagnostic to it, so `RuleMessage.Help` has to stand on its own. |
 
 ---
 
@@ -298,7 +298,7 @@ performance claim, because nothing here has been profiled — see *Known gaps*.
 - **Nothing proves a rule fires through the built binary.** Every assertion in this repository goes
   through `rule_tester`, which constructs its own program and calls `r.Run` directly. The old fork's
   fixture-gate and its 19 fixture projects covered this and were deleted with `old/` as a deliberate
-  trade (PORT.md, *Known gap*). Section A's DISCOVERY items are therefore the least-verified in
+  trade. Section A's DISCOVERY items are therefore the least-verified in
   practice: a discovery-level break shows up as a rule that silently stops running.
 - **No CI.** There is no `.github/` in this repository. Every `TEST`, `VET`, `GOFMT` and `MUTATION`
   tag names a command someone has to run, not a gate that blocks a merge.
@@ -307,8 +307,8 @@ performance claim, because nothing here has been profiled — see *Known gaps*.
   no timing flag and no rule here has ever been profiled. Items asserting a cost model — guard
   before checker call, narrowest node kind, allocation in `Run` — were dropped rather than shipped
   as reasoning dressed up as findings. Add them when there is a measurement.
-- **The mutation numbers are historical.** PORT.md records 100% test efficacy per rule package and
-  for `archkit` at the time of the port. That was not re-run for this checklist.
+- **The mutation numbers are historical.** 100% test efficacy per rule package and for `archkit`
+  was recorded at the time of the port; it was not re-run for this checklist.
 - **`archkit`'s ten recorded cross-package survivors were not re-verified.** The comment in
   `types.go` names which rule-tester cases cover them; that claim is taken at face value here.
 - **Upstream tsgolint behaviour is read from the vendored cache**, at
@@ -318,5 +318,5 @@ performance claim, because nothing here has been profiled — see *Known gaps*.
 - **Two conventions have no stated rationale and were left as CONV rather than promoted:** why
   `Help` is universal (inferable from the dropped docs URLs) and why no rule offers a fix. Both are
   uniform across 19 rules, which is evidence of a decision but not a record of one.
-- **Not covered:** the `lintcn add` / vendoring path, the stale build-lock gotcha (PORT.md §9), and
+- **Not covered:** the `lintcn add` / vendoring path, the stale build-lock gotcha (see the README), and
   `--fix` semantics. None are rule-authoring propositions.

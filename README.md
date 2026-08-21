@@ -45,6 +45,7 @@ Severity is `error` unless marked.
 ## Develop
 
 One package per rule under `.lintcn/`, sharing `.lintcn/archkit/`.
+`npm run new:rule` generates one; it starts deliberately RED.
 
 ```bash
 cd .lintcn
@@ -54,5 +55,9 @@ TSGOLINT_SNAPSHOT_CWD=true UPDATE_SNAPS=true go test ./...
 gremlins unleash ./<rule>/
 ```
 
-`docs/in-progress/port-old-rules-to-lintcn.md` holds the conventions a new
-rule must follow; they are not in the vendored lintcn skill.
+Aborting a `lintcn lint` or `build` leaves a lock directory under
+`~/.cache/lintcn/locks/build/<hash>` that blocks every later run. Remove it,
+or `npx lintcn clean`.
+
+`CHECKLIST.md` holds the conventions a new rule must follow, with what
+enforces each. `docs/rules/` documents what each rule judges and why.
