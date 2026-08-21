@@ -1,0 +1,80 @@
+
+[TestDomainStateIsDeeplyReadonly/invalid-0 - 1]
+Diagnostic 1: mutableMemberResolved (3:21 - 3:28)
+Message: `Occasion.funding.pledges` is writable once `FundingState` is followed, so the state the root guards can be altered through a member the root never sees changing.
+Help: Mark the member `readonly` where it is declared, and return the next state from the transition instead.
+   2 |         type FundingState = { pledges: ReadonlyArray<string>; readonly closed: boolean }
+   3 |         export type Occasion = { readonly id: string; readonly funding: FundingState }
+     |                     ~~~~~~~~
+   4 |       
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-1 - 1]
+Diagnostic 1: mutableCollectionResolved (3:21 - 3:28)
+Message: `Occasion.pledges` resolves to a mutable `Array`, so a `readonly` binding still hands the caller something it can add to and remove from.
+Help: Replace the collection with `ReadonlyArray`, `ReadonlyMap` or `ReadonlySet` where the type is declared.
+   2 |         type PledgeList = string[]
+   3 |         export type Occasion = { readonly pledges: PledgeList }
+     |                     ~~~~~~~~
+   4 |       
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-2 - 1]
+Diagnostic 1: mutableCollectionResolved (4:26 - 4:33)
+Message: `Occasion.funding.pledges` resolves to a mutable `Array`, so a `readonly` binding still hands the caller something it can add to and remove from.
+Help: Replace the collection with `ReadonlyArray`, `ReadonlyMap` or `ReadonlySet` where the type is declared.
+   3 |         type FundingState = { readonly pledges: PledgeList }
+   4 |         export interface Occasion { readonly funding: FundingState }
+     |                          ~~~~~~~~
+   5 |       
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-3 - 1]
+Diagnostic 1: mutableCollectionResolved (3:21 - 3:28)
+Message: `Occasion.index` resolves to a mutable `Map`, so a `readonly` binding still hands the caller something it can add to and remove from.
+Help: Replace the collection with `ReadonlyArray`, `ReadonlyMap` or `ReadonlySet` where the type is declared.
+   2 |         type Index = Map<string, number>
+   3 |         export type Occasion = { readonly index: Index | undefined }
+     |                     ~~~~~~~~
+   4 |       
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-4 - 1]
+Diagnostic 1: mutableMemberResolved (3:21 - 3:28)
+Message: `Occasion.pledges[].amount` is writable once `ReadonlyArray` is followed, so the state the root guards can be altered through a member the root never sees changing.
+Help: Mark the member `readonly` where it is declared, and return the next state from the transition instead.
+   2 |         type Pledge = { amount: number }
+   3 |         export type Occasion = { readonly pledges: ReadonlyArray<Pledge> }
+     |                     ~~~~~~~~
+   4 |       
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-5 - 1]
+Diagnostic 1: mutableMemberResolved (3:21 - 3:25)
+Message: `Money.minor.units` is writable once `Minor` is followed, so the state the root guards can be altered through a member the root never sees changing.
+Help: Mark the member `readonly` where it is declared, and return the next state from the transition instead.
+   2 |         type Minor = { units: number }
+   3 |         export type Money = { readonly minor: Minor; readonly currency: "AUD" }
+     |                     ~~~~~
+   4 |       
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-6 - 1]
+Diagnostic 1: mutableCollectionResolved (3:21 - 3:32)
+Message: `FundingState.pledges` resolves to a mutable `Array`, so a `readonly` binding still hands the caller something it can add to and remove from.
+Help: Replace the collection with `ReadonlyArray`, `ReadonlyMap` or `ReadonlySet` where the type is declared.
+   2 |         type PledgeList = string[]
+   3 |         export type FundingState = { readonly pledges: PledgeList }
+     |                     ~~~~~~~~~~~~
+   4 |         export type Occasion = { readonly funding: FundingState }
+---
+
+[TestDomainStateIsDeeplyReadonly/invalid-7 - 1]
+Diagnostic 1: mutableCollectionResolved (3:21 - 3:28)
+Message: `Occasion.tags` resolves to a mutable `Set`, so a `readonly` binding still hands the caller something it can add to and remove from.
+Help: Replace the collection with `ReadonlyArray`, `ReadonlyMap` or `ReadonlySet` where the type is declared.
+   2 |         type Bag = Set<string>
+   3 |         export type Occasion = { readonly tags: Bag }
+     |                     ~~~~~~~~
+   4 |       
+---

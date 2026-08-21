@@ -97,6 +97,12 @@ func CallSignatures(c *checker.Checker, t *checker.Type) []*checker.Signature {
 	return checker.Checker_getSignaturesOfType(c, t, checker.SignatureKindCall)
 }
 
+// IsCallable reports whether a type is a function — behaviour, which is not
+// state and not worth following for its mutability.
+func IsCallable(c *checker.Checker, t *checker.Type) bool {
+	return len(CallSignatures(c, t)) > 0
+}
+
 // Members returns a type's properties paired with their own types, which is
 // how both `{ save: (o) => void }` and `interface P { save(o): void }` are read
 // as the same contract.

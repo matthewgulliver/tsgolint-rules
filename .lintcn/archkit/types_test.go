@@ -23,6 +23,9 @@ func TestNilInputsReturnNothingRatherThanPanic(t *testing.T) {
 	if got := CallSignatures(nil, nil); got != nil {
 		t.Errorf("CallSignatures(nil, nil) = %v, want nil", got)
 	}
+	if IsCallable(nil, nil) {
+		t.Errorf("IsCallable(nil, nil) = true, want false")
+	}
 	if got := Members(nil, nil); got != nil {
 		t.Errorf("Members(nil, nil) = %v, want nil", got)
 	}
