@@ -68,7 +68,7 @@ func isExported(declaration *ast.Node) bool {
 }
 
 func repositoryOwned(file string) bool {
-	return !archkit.IsStandardLibrary(file) && !archkit.IsPackageDependency(file)
+	return !archkit.IsOutsideDependency(file)
 }
 
 func writtenCollection(node *ast.Node, names map[string]bool) bool {

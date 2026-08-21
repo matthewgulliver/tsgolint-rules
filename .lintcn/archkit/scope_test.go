@@ -108,3 +108,73 @@ func TestContextOf(t *testing.T) {
 		})
 	}
 }
+
+func TestOrigin(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name                                 string
+		file                                 string
+		standardLibrary, packageDep, outside bool
+	}{
+		{"the TypeScript standard library ships inside node_modules, and is not a dependency the repository chose",
+			"/repo/node_modules/typescript/lib/lib.es5.d.ts", true, false, true},
+		{"a pnpm store path reaches the same lib",
+			"/repo/node_modules/.pnpm/typescript@5.9.2/node_modules/typescript/lib/lib.dom.d.ts", true, false, true},
+		{"a real dependency is not the standard library",
+			"/repo/node_modules/zod/index.d.ts", false, true, true},
+		{"a scoped dependency is a dependency",
+			"/repo/node_modules/@lumi/shared/index.d.ts", false, true, true},
+		{"repository source is neither",
+			"/repo/packages/gifting/hexagon/domain/src/occasion.ts", false, false, false},
+		{"windows separators are normalised",
+			`C:\repo\node_modules\typescript\lib\lib.es2015.d.ts`, true, false, true},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			t.Parallel()
+			if got := IsStandardLibrary(testCase.file); got != testCase.standardLibrary {
+				t.Errorf("IsStandardLibrary(%q) = %v, want %v", testCase.file, got, testCase.standardLibrary)
+			}
+			if got := IsPackageDependency(testCase.file); got != testCase.packageDep {
+				t.Errorf("IsPackageDependency(%q) = %v, want %v", testCase.file, got, testCase.packageDep)
+			}
+			if got := IsOutsideDependency(testCase.file); got != testCase.outside {
+				t.Errorf("IsOutsideDependency(%q) = %v, want %v", testCase.file, got, testCase.outside)
+			}
+		})
+	}
+}
+
+func TestDeclaredByPackageDependency(t *testing.T) {
+	t.Parallel()
+
+	cases := []struct {
+		name  string
+		files []string
+		want  bool
+	}{
+		{"a platform global that @types/node augments is not a collaborator a package supplies",
+			[]string{"/lib.es5.d.ts", "/repo/node_modules/@types/node/globals.d.ts"}, false},
+		{"the same holds when the standard library itself sits under node_modules",
+			[]string{"/repo/node_modules/typescript/lib/lib.es5.d.ts", "/repo/node_modules/@types/node/globals.d.ts"}, false},
+		{"a genuine third-party class is a collaborator",
+			[]string{"/repo/node_modules/pg/lib/client.d.ts"}, true},
+		{"a repository type is not",
+			[]string{"/repo/packages/gifting/hexagon/domain/src/occasion.ts"}, false},
+		{"a type the repository declares and a package augments is still the repository's",
+			[]string{"/repo/packages/gifting/hexagon/domain/src/occasion.ts", "/lib.es5.d.ts"}, false},
+		{"nothing declared is nothing to report",
+			nil, false},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.name, func(t *testing.T) {
+			t.Parallel()
+			if got := DeclaredByPackageDependency(testCase.files); got != testCase.want {
+				t.Errorf("DeclaredByPackageDependency(%v) = %v, want %v", testCase.files, got, testCase.want)
+			}
+		})
+	}
+}

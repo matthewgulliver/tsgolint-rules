@@ -94,7 +94,7 @@ func isBranded(c *checker.Checker, t *checker.Type) bool {
 				continue
 			}
 			for _, file := range archkit.DeclaringFilesOfSymbol(c.GetSymbolAtLocation(key)) {
-				if !archkit.IsStandardLibrary(file) && !archkit.IsPackageDependency(file) {
+				if !archkit.IsOutsideDependency(file) {
 					return true
 				}
 			}
@@ -119,7 +119,7 @@ func notOurs(declaration *ast.Node) bool {
 		return false
 	}
 	file := sourceFile.FileName()
-	return archkit.IsStandardLibrary(file) || archkit.IsPackageDependency(file)
+	return archkit.IsOutsideDependency(file)
 }
 
 func compileAll(patterns []string) []*regexp.Regexp {

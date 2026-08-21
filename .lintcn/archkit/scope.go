@@ -57,8 +57,15 @@ func IsOutsideDependency(fileName string) bool {
 	return IsPackageDependency(fileName) || IsStandardLibrary(fileName)
 }
 
+func DeclaredByPackageDependency(files []string) bool {
+	if slices.ContainsFunc(files, IsStandardLibrary) {
+		return false
+	}
+	return slices.ContainsFunc(files, IsPackageDependency)
+}
+
 func IsPackageDependency(fileName string) bool {
-	return slices.Contains(split(fileName), "node_modules")
+	return !IsStandardLibrary(fileName) && slices.Contains(split(fileName), "node_modules")
 }
 
 func IsStandardLibrary(fileName string) bool {

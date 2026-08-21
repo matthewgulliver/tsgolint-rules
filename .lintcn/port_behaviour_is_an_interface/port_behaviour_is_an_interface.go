@@ -56,10 +56,6 @@ func readableAsWritten(node *ast.Node, written *ast.Node) bool {
 	return false
 }
 
-func isCallable(c *checker.Checker, t *checker.Type) bool {
-	return len(checker.Checker_getSignaturesOfType(c, t, checker.SignatureKindCall)) > 0
-}
-
 var PortBehaviourIsAnInterfaceRule = rule.Rule{
 	Name: "port-behaviour-is-an-interface",
 	Run: archkit.Gated(defaultFiles, func(ctx rule.RuleContext, options any) rule.RuleListeners {
@@ -83,7 +79,7 @@ var PortBehaviourIsAnInterfaceRule = rule.Rule{
 				alias := name.Text()
 				declared := checker.Checker_getTypeFromTypeNode(ctx.TypeChecker, declaration.Type)
 
-				if isCallable(ctx.TypeChecker, declared) {
+				if archkit.IsCallable(ctx.TypeChecker, declared) {
 					ctx.ReportNode(node, buildBareFunctionTypeAliasMessage(alias))
 					return
 				}
@@ -93,7 +89,10 @@ var PortBehaviourIsAnInterfaceRule = rule.Rule{
 				}
 
 				for _, member := range checker.Checker_getPropertiesOfType(ctx.TypeChecker, declared) {
-					if isCallable(ctx.TypeChecker, checker.Checker_getTypeOfSymbol(ctx.TypeChecker, member)) {
+					if !archkit.DeclaredInRepository(member) {
+						continue
+					}
+					if archkit.IsCallable(ctx.TypeChecker, checker.Checker_getTypeOfSymbol(ctx.TypeChecker, member)) {
 						ctx.ReportNode(node, buildBehaviourContractAsTypeAliasMessage(alias, member.Name))
 						return
 					}

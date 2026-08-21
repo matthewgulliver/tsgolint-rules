@@ -29,6 +29,12 @@ func TestPortBehaviourIsAnInterface(t *testing.T) {
       type Occasion = { readonly id: string };
       export type StoredOccasion = { readonly value: Occasion; readonly version: number }
     `, FileName: inPorts},
+		{Code: `
+      type Brand<T, B extends string> = T & { readonly __brand: B };
+      export type ClientId = Brand<string, "ClientId">
+    `, FileName: inPorts},
+		{Code: `export type RedactionMap = Map<string, string>`, FileName: inPorts},
+		{Code: `export type Selected = ReadonlyArray<string>`, FileName: inPorts},
 		{Code: `export type PledgeResult = "saved" | "conflict"`, FileName: inPorts},
 		{Code: `type ToCard = (row: string) => string`, FileName: inPorts},
 		{Code: `export type ForPledgingToOccasions = (command: string) => Promise<string>`, FileName: inPorts},

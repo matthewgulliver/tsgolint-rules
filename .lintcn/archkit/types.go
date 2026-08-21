@@ -33,6 +33,16 @@ func DeclaringFilesOfSymbol(symbol *ast.Symbol) []string {
 	return files
 }
 
+func DeclaredInRepository(symbol *ast.Symbol) bool {
+	files := DeclaringFilesOfSymbol(symbol)
+	for _, file := range files {
+		if !IsOutsideDependency(file) {
+			return true
+		}
+	}
+	return false
+}
+
 func DeclaredUnder(c *checker.Checker, expression *ast.Node, fragments []string) bool {
 	if expression == nil {
 		return false

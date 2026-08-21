@@ -80,7 +80,7 @@ var ContextModelDoesNotCrossTheBoundaryRule = rule.Rule{
 				}
 				file := sourceFile.FileName()
 
-				if archkit.IsStandardLibrary(file) || archkit.IsPackageDependency(file) {
+				if archkit.IsOutsideDependency(file) {
 					continue
 				}
 				if archkit.Includes(shared, file) {
