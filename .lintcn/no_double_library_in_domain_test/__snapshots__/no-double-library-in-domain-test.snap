@@ -1,0 +1,20 @@
+
+[TestNoDoubleLibraryInDomainTest/invalid-0 - 1]
+Diagnostic 1: doubleLibrary (3:9 - 3:13)
+Message: `fn` comes from a test-double library, so this domain test substitutes a collaborator where the subject is meant to make a pure decision with no doubles.
+Help: Call the aggregate command or domain service directly with domain values; move any collaboration to a use-case or adapter test.
+   2 |         import { vi } from "vitest"
+   3 |         vi.fn()
+     |         ~~~~~
+   4 |       
+---
+
+[TestNoDoubleLibraryInDomainTest/invalid-1 - 1]
+Diagnostic 1: doubleLibrary (3:9 - 3:21)
+Message: `spyOn` comes from a test-double library, so this domain test substitutes a collaborator where the subject is meant to make a pure decision with no doubles.
+Help: Call the aggregate command or domain service directly with domain values; move any collaboration to a use-case or adapter test.
+   2 |         import { vi as doubles } from "vitest"
+   3 |         doubles.spyOn({}, "save")
+     |         ~~~~~~~~~~~~~
+   4 |       
+---

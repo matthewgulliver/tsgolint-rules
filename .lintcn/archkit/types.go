@@ -10,6 +10,8 @@
 package archkit
 
 import (
+	"strings"
+
 	"github.com/microsoft/typescript-go/shim/ast"
 	"github.com/microsoft/typescript-go/shim/checker"
 	"github.com/typescript-eslint/tsgolint/internal/utils"
@@ -27,11 +29,12 @@ func DeclaringFiles(t *checker.Type) []string {
 	// by the rule packages' rule_tester cases (an anonymous object-literal
 	// type has no symbol; a synthesized declaration has no source file), and
 	// so are the checker-dependent arms of the helpers below (a non-array
-	// type, an unawaited one). The TypeReferenceNames and declaredName walks
-	// run on every rule_tester signature. Gremlins cannot see that coverage
-	// cross-package, so the nine surviving NOT COVERED mutants in this file
-	// are recorded as covered there; DeclaredType's two nil arms are
-	// defensive and documented at the function.
+	// type, an unawaited one; DeclaredUnder's nil symbol, reached by a
+	// call-expression base in the double-library tests). The TypeReferenceNames
+	// and declaredName walks run on every rule_tester signature. Gremlins
+	// cannot see that coverage cross-package, so the ten surviving NOT COVERED
+	// mutants in this file are recorded as covered there; DeclaredType's two
+	// nil arms are defensive and documented at the function.
 	if symbol == nil {
 		return nil
 	}
@@ -51,6 +54,30 @@ func DeclaringFilesOfSymbol(symbol *ast.Symbol) []string {
 		}
 	}
 	return files
+}
+
+// DeclaredUnder reports whether a written expression resolves to a symbol
+// declared in a file containing any of the path fragments — how a property
+// access is told apart from the library's double methods by where the value
+// behind it is declared.
+func DeclaredUnder(c *checker.Checker, expression *ast.Node, fragments []string) bool {
+	if expression == nil {
+		return false
+	}
+	symbol := c.GetSymbolAtLocation(expression)
+	if symbol == nil {
+		return false
+	}
+	symbol = checker.SkipAlias(symbol, c)
+	for _, file := range DeclaringFilesOfSymbol(symbol) {
+		normalized := strings.ReplaceAll(file, "\\", "/")
+		for _, fragment := range fragments {
+			if strings.Contains(normalized, fragment) {
+				return true
+			}
+		}
+	}
+	return false
 }
 
 // Constituents flattens a union into its members, and returns a non-union

@@ -38,4 +38,7 @@ func TestNilInputsReturnNothingRatherThanPanic(t *testing.T) {
 	if got := WrittenName(nil); got != "" {
 		t.Errorf("WrittenName(nil) = %q, want empty", got)
 	}
+	if DeclaredUnder(nil, nil, nil) {
+		t.Errorf("DeclaredUnder(nil, nil, nil) = true, want false")
+	}
 }
