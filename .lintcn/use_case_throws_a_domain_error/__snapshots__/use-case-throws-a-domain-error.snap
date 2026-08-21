@@ -1,0 +1,46 @@
+
+[TestUseCaseThrowsADomainError/invalid-0 - 1]
+Diagnostic 1: foreignThrow (1:31 - 1:64)
+Message: This throws `Error`, declared by the standard library, so the failure carries no business meaning and every surface must invent copy for it.
+Help: Return the expected outcome as a member of the result union, or throw an error type the domain declares.
+   1 | export const pledge = () => { throw new Error("occasion closed") }
+     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestUseCaseThrowsADomainError/invalid-1 - 1]
+Diagnostic 1: foreignThrow (3:39 - 3:73)
+Message: This throws `DatabaseError`, declared by a package dependency, so the failure carries no business meaning and every surface must invent copy for it.
+Help: Return the expected outcome as a member of the result union, or throw an error type the domain declares.
+   2 |         import { DatabaseError } from "pg"
+   3 |         export const pledge = () => { throw new DatabaseError("conflict") }
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestUseCaseThrowsADomainError/invalid-2 - 1]
+Diagnostic 1: foreignThrow (3:39 - 3:65)
+Message: This throws `TypeError`, declared by the standard library, so the failure carries no business meaning and every surface must invent copy for it.
+Help: Return the expected outcome as a member of the result union, or throw an error type the domain declares.
+   2 |         const Failure = TypeError
+   3 |         export const pledge = () => { throw new Failure("closed") }
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestUseCaseThrowsADomainError/invalid-3 - 1]
+Diagnostic 1: foreignThrow (1:31 - 1:55)
+Message: This throws `Error`, declared by the standard library, so the failure carries no business meaning and every surface must invent copy for it.
+Help: Return the expected outcome as a member of the result union, or throw an error type the domain declares.
+   1 | export const pledge = () => { throw new Error("closed") }
+     |                               ~~~~~~~~~~~~~~~~~~~~~~~~~
+---
+
+[TestUseCaseThrowsADomainError/invalid-4 - 1]
+Diagnostic 1: foreignThrow (3:39 - 3:73)
+Message: This throws `DatabaseError`, declared by a package dependency, so the failure carries no business meaning and every surface must invent copy for it.
+Help: Return the expected outcome as a member of the result union, or throw an error type the domain declares.
+   2 |         import { DatabaseError } from "pg"
+   3 |         export const pledge = () => { throw new DatabaseError("conflict") }
+     |                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
