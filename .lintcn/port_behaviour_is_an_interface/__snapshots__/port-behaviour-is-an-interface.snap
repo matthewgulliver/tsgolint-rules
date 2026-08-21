@@ -1,0 +1,38 @@
+
+[TestPortBehaviourIsAnInterface/invalid-0 - 1]
+Diagnostic 1: behaviourContractAsTypeAlias (3:9 - 3:92)
+Message: `ForPledgingToOccasions.pledgeToOccasion` resolves to a callable, so `ForPledgingToOccasions` is a behaviour contract an adapter implements, declared with the keyword this repository reserves for data shapes.
+Help: Declare `ForPledgingToOccasions` as an `interface`; keep `type` for the pure data shapes beside it.
+   2 |         type PledgeToOccasion = (command: string) => Promise<string>;
+   3 |         export type ForPledgingToOccasions = { readonly pledgeToOccasion: PledgeToOccasion }
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPortBehaviourIsAnInterface/invalid-1 - 1]
+Diagnostic 1: bareFunctionTypeAlias (3:9 - 3:53)
+Message: `ForPledgingToOccasions` resolves to a bare function type, so the role has no name and an adapter holds a callable rather than a collaborator.
+Help: Declare an interface whose method is the operation, so the actor's second operation is an added method rather than a second injected parameter.
+   2 |         type Pledging = (command: string) => Promise<string>;
+   3 |         export type ForPledgingToOccasions = Pledging
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   4 |       
+---
+
+[TestPortBehaviourIsAnInterface/invalid-2 - 1]
+Diagnostic 1: behaviourContractAsTypeAlias (4:9 - 4:55)
+Message: `PledgePersistence.findOccasionById` resolves to a callable, so `PledgePersistence` is a behaviour contract an adapter implements, declared with the keyword this repository reserves for data shapes.
+Help: Declare `PledgePersistence` as an `interface`; keep `type` for the pure data shapes beside it.
+   3 |         type Version = { readonly version: number };
+   4 |         export type PledgePersistence = Reads & Version
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   5 |       
+---
+
+[TestPortBehaviourIsAnInterface/invalid-3 - 1]
+Diagnostic 1: bareFunctionTypeAlias (1:1 - 1:37)
+Message: `ToCard` resolves to a bare function type, so the role has no name and an adapter holds a callable rather than a collaborator.
+Help: Declare an interface whose method is the operation, so the actor's second operation is an added method rather than a second injected parameter.
+   1 | type ToCard = (row: string) => string
+     | ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+---
