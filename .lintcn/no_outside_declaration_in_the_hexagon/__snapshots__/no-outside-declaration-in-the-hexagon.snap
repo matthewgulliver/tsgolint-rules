@@ -1,0 +1,70 @@
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-0 - 1]
+Diagnostic 1: outsideDeclarationImported (2:18 - 2:41)
+Message: `PostgresPledgeRepository` is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so the inside now depends on an adapter, a host or the composition root and can no longer be driven without it — however the import was spelled.
+Help: Depend on a port declared inside the hexagon and let composition hand the adapter in.
+   1 | 
+   2 |         import { PostgresPledgeRepository } from "../../adapters/driven/postgres/src/repo"
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |         export const repository = new PostgresPledgeRepository()
+---
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-1 - 1]
+Diagnostic 1: outsideDeclarationImported (2:18 - 2:41)
+Message: `PostgresPledgeRepository` is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so the inside now depends on an adapter, a host or the composition root and can no longer be driven without it — however the import was spelled.
+Help: Depend on a port declared inside the hexagon and let composition hand the adapter in.
+   1 | 
+   2 |         import { PostgresPledgeRepository } from "./index"
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |         export const repository = new PostgresPledgeRepository()
+---
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-2 - 1]
+Diagnostic 1: outsideDeclarationImported (2:18 - 2:41)
+Message: `PostgresPledgeRepository` is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so the inside now depends on an adapter, a host or the composition root and can no longer be driven without it — however the import was spelled.
+Help: Depend on a port declared inside the hexagon and let composition hand the adapter in.
+   1 | 
+   2 |         import { PostgresPledgeRepository } from "@gifting/adapters-postgres"
+     |                  ~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |         export const repository = new PostgresPledgeRepository()
+---
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-3 - 1]
+Diagnostic 1: outsideDeclarationImported (2:23 - 2:31)
+Message: `StoredRow` is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so the inside now depends on an adapter, a host or the composition root and can no longer be driven without it — however the import was spelled.
+Help: Depend on a port declared inside the hexagon and let composition hand the adapter in.
+   1 | 
+   2 |         import type { StoredRow } from "../../../adapters/driven/postgres/src/repo"
+     |                       ~~~~~~~~~
+   3 |         export const toOccasion = (row: StoredRow) => row.id
+---
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-4 - 1]
+Diagnostic 1: outsideDeclarationImported (2:16 - 2:28)
+Message: `postgres` is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so the inside now depends on an adapter, a host or the composition root and can no longer be driven without it — however the import was spelled.
+Help: Depend on a port declared inside the hexagon and let composition hand the adapter in.
+   1 | 
+   2 |         import * as postgres from "../../adapters/driven/postgres/src/repo"
+     |                ~~~~~~~~~~~~~
+   3 |         export const repository = new postgres.PostgresPledgeRepository()
+---
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-5 - 1]
+Diagnostic 1: outsideModuleImported (2:9 - 2:56)
+Message: This module resolves to `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so loading the inside now loads an adapter, a host or the composition root — however the specifier was spelled.
+Help: Import the port or domain module the inside owns, and let composition load the adapter.
+   1 | 
+   2 |         import "../../adapters/driven/postgres/src/repo"
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
+
+[TestNoOutsideDeclarationInTheHexagon/invalid-6 - 1]
+Diagnostic 1: outsideModuleImported (2:9 - 2:90)
+Message: This module resolves to `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/adapters/driven/postgres/src/repo.ts`, outside the hexagon, so loading the inside now loads an adapter, a host or the composition root — however the specifier was spelled.
+Help: Import the port or domain module the inside owns, and let composition load the adapter.
+   1 | 
+   2 |         export { PostgresPledgeRepository } from "../../adapters/driven/postgres/src/repo"
+     |         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   3 |       
+---
