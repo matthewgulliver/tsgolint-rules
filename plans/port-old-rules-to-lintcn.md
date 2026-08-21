@@ -49,10 +49,30 @@ usage + their tests (the old `_test.go` files are the spec).
 
 ## Phase 2 — Port rules in dependency-risk order (TDD per rule)
 
+### Commit discipline (one rule per commit)
+
+Every commit is a labelled example (see ~/repos/personal/commit-rules):
+
+- **One rule port per commit, and the commit is complete**: the new
+  `.lintcn/<rule>/` (rule + tests + snapshots), the helper code it needs, and
+  the **deletion of `old/rules/<rule>/` (and its fixture docs/tests that
+  exist only for it) in the same commit**. After each commit, no trace of the
+  old rule remains — the port is a move + adaptation, and the commit's diff
+  shows exactly what changed while moving.
+- Commit message states the rule name in the subject (the message is the
+  index) and, where the port was not a pure move, a short body on what
+  changed and why (e.g. "archrule.Files gating replaced with in-Run glob
+  check because lintcn registration has no Files field").
+- Never mix two rule ports or a rule port with unrelated tooling changes;
+  helper-only refactors get their own commits.
+- Order still follows the dependency-risk sequence below so every commit
+  builds and tests green on its own (`go build ./... && go test ./...`).
+
 Per rule (RED→GREEN): copy rule + test into `.lintcn/<snake>/` → run
 `go test -run TestX` (fails on missing helpers) → port/adapt logic → green →
 `UPDATE_SNAPS=true` → read snapshot to verify message quality → add
-`lintcn:name` / `lintcn:description` / `lintcn:severity` metadata.
+`lintcn:name` / `lintcn:description` / `lintcn:severity` metadata → commit
+with the old rule deleted.
 
 Order:
 1. **Checker-only rules** (no archscope): `stored_state_switch_has_a_throwing_default`,
@@ -75,13 +95,17 @@ Order:
   test rules): `// lintcn:severity warn`.
 Revisit per rule after seeing violation volume on `old/fixtures/`.
 
-## Phase 3 — End-to-end verification
+## Phase 3 — End-to-end verification + final cleanup commit
 
 1. `cd .lintcn && go build ./... && go test -v ./...` — all green.
 2. `npx lintcn lint` against `old/fixtures/` trees — each rule fires on its
    fixture's violations; glob gating respected; severities correct.
 3. Spot-check snapshots for message quality (they are the agent-facing output).
-4. Decide: keep `tsconfig.json` scoped to fixtures, or add a demo lint target.
+4. Final commit deletes whatever remains under `old/` once empty (fixtures
+   trees move or go with their last consumer; `old/archlint`, `old/internal`
+   go with the last rule that consumed them) — the tree ends with no dead
+   `old/` residue.
+5. Decide: keep `tsconfig.json` scoped to fixtures, or add a demo lint target.
 
 ## Open questions (resolved by default)
 
