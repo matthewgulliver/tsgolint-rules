@@ -241,10 +241,10 @@ Sources: `.lintcn/.tsgolint/internal/rule_tester/snapshot.go`.
 | --- | --- | --- | --- |
 | J1 | `go build ./...` succeeds from `.lintcn/`. | every change | COMPILE |
 | J2 | `go vet ./...` is clean. | every change | VET (verified clean at the time of writing) |
-| J3 | `gofmt -l .` reports nothing. | every file | GOFMT — **currently NO**: three committed test files have unaligned struct-literal keys (`no_constructed_collaborators`, `port_behaviour_is_an_interface`, `published_contract_publishes_no_mutable_value`). No hook or CI enforces it; `plopfile.js` runs `gofmt -w` only on generated files. |
-| J4 | The rule file has a package doc comment, or the `lintcn:` block plus per-function comments carry the explanation. | every rule | CONV (only `archkit` carries package docs; rule packages explain themselves at the message builders and the decision functions) |
+| J3 | `gofmt -l .` reports nothing. | every file | GOFMT (verified clean; no hook or CI enforces it, and `plopfile.js` runs `gofmt -w` only on generated files) |
+| J4 | The rule carries no explanation in the source. What a rule judges and why lives in `docs/rules/`; the comments the sources once held are in `docs/rule-comments.md`. | every rule | CONV |
 | J5 | Every exported symbol in `archkit` is consumed by at least one rule. | `archkit` | MUTATION (see E9) |
-| J6 | Comments record the constraint or the recorded failure, not a restatement of the code. | every file | CONV (`types.go` and `scope.go` are the model: each comment names a real bug the code exists to prevent) |
+| J6 | No comment appears in the source except `// lintcn:` metadata and Go compiler directives (`//go:`, `//nolint`). | every file | `npm run lint:comments` — the `tools/nocomments` analyzer; exit 3 standalone, 1 under `go vet -vettool`. `-fix` removes them. No `//nolint` escape hatch, since it runs standalone rather than through golangci-lint. |
 | J7 | No rule imports another rule package. | every rule | CONV (shared logic goes to `archkit`; the packages are siblings with no dependency order) |
 
 ---

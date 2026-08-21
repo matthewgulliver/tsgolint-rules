@@ -2,7 +2,8 @@
   "type": "module",
   "scripts": {
     "new:rule": "plop rule",
-    "comments": "cd tools/comments && GOWORK=off go run . ../../.lintcn ../../docs/rule-comments.md"
+    "comments": "cd tools/comments && GOWORK=off go run . ../../.lintcn ../../docs/rule-comments.md",
+    "lint:comments": "GOWORK=off go build -C tools/nocomments -o \"$PWD/.nocomments\" ./cmd/nocomments && cd .lintcn && \"$PWD/../.nocomments\" ./..."
   },
   "dependencies": {
     "lintcn": "^0.10.1"
