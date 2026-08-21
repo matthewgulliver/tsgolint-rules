@@ -29,4 +29,7 @@ func TestNilInputsReturnNothingRatherThanPanic(t *testing.T) {
 	if got := ReturnType(nil, nil); got != nil {
 		t.Errorf("ReturnType(nil, nil) = %v, want nil", got)
 	}
+	if got := TypeReferenceNames(nil); got != nil {
+		t.Errorf("TypeReferenceNames(nil) = %v, want nil", got)
+	}
 }

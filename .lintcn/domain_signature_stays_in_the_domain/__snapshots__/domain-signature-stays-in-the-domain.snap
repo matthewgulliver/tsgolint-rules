@@ -1,0 +1,30 @@
+
+[TestDomainSignatureStaysInTheDomain/invalid-0 - 1]
+Diagnostic 1: foreignParameterType (6:11 - 6:40)
+Message: Parameter `persistence` is declared as `PledgePersistence`, which is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/application/src/ports/pledge-persistence.ts`, so the decision can only be made by a caller holding a type the model does not own.
+Help: Take the fact as a domain value or a shared-kernel value, and let the caller translate before it asks for the decision.
+   5 |           occasion: Occasion,
+   6 |           persistence: PledgePersistence,
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         ): Occasion => occasion
+---
+
+[TestDomainSignatureStaysInTheDomain/invalid-1 - 1]
+Diagnostic 1: foreignReturnType (4:22 - 4:39)
+Message: `pledgeContribution` returns `PledgeResult`, which is declared in `/home/skag/repos/personal/tsgolint-rules/.lintcn/.tsgolint/internal/rules/fixtures/packages/gifting/hexagon/application/src/ports/pledge-persistence.ts`, so the model's answer is expressed in someone else's vocabulary.
+Help: Return a domain value or an explicit business refusal the model declares, and let the caller map it onward.
+   3 |         import type { Occasion } from "../occasions/occasion"
+   4 |         export const pledgeContribution = (occasion: Occasion): PledgeResult =>
+     |                      ~~~~~~~~~~~~~~~~~~
+   5 |           ({ saved: true })
+---
+
+[TestDomainSignatureStaysInTheDomain/invalid-2 - 1]
+Diagnostic 1: foreignParameterType (6:11 - 6:46)
+Message: Parameter `charges` is declared as `StripeCharge`, which is declared in a package dependency, so the decision can only be made by a caller holding a type the model does not own.
+Help: Take the fact as a domain value or a shared-kernel value, and let the caller translate before it asks for the decision.
+   5 |           occasion: Occasion,
+   6 |           charges: ReadonlyArray<StripeCharge>,
+     |           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   7 |         ): Occasion {
+---

@@ -27,8 +27,9 @@ func DeclaringFiles(t *checker.Type) []string {
 	// by the rule packages' rule_tester cases (an anonymous object-literal
 	// type has no symbol; a synthesized declaration has no source file), and
 	// so are the checker-dependent arms of the helpers below (a non-array
-	// type, an unawaited one). Gremlins cannot see that coverage
-	// cross-package, so the five surviving NOT COVERED mutants in this file
+	// type, an unawaited one). The TypeReferenceNames and declaredName walks
+	// run on every rule_tester signature. Gremlins cannot see that coverage
+	// cross-package, so the nine surviving NOT COVERED mutants in this file
 	// are recorded as covered there; DeclaredType's two nil arms are
 	// defensive and documented at the function.
 	if symbol == nil {
@@ -138,6 +139,38 @@ func DeclaredType(c *checker.Checker, declaration *ast.Node) *checker.Type {
 		return nil
 	}
 	return checker.Checker_getDeclaredTypeOfSymbol(c, symbol)
+}
+
+// TypeReferenceNames returns the written type names a type annotation
+// mentions, qualified names reduced to their rightmost name. This is how a
+// signature's vocabulary is read syntactically — before resolution decides
+// whether each name is foreign.
+func TypeReferenceNames(annotation *ast.Node) []*ast.Node {
+	if annotation == nil {
+		return nil
+	}
+	names := make([]*ast.Node, 0, 4)
+	var walk func(node *ast.Node) bool
+	walk = func(node *ast.Node) bool {
+		if node.Kind == ast.KindTypeReference {
+			if name := declaredName(node.AsTypeReferenceNode().TypeName); name != nil {
+				names = append(names, name)
+			}
+		}
+		node.ForEachChild(walk)
+		return false
+	}
+	walk(annotation)
+	return names
+}
+
+// declaredName reduces a type name, which may be qualified like
+// `some.Namespace.Type`, to the rightmost identifier the resolver knows.
+func declaredName(name *ast.Node) *ast.Node {
+	for name != nil && name.Kind == ast.KindQualifiedName {
+		name = name.AsQualifiedName().Right
+	}
+	return name
 }
 
 // ReturnType returns a signature's return type.
